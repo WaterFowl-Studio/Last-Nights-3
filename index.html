@@ -3,58 +3,56 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Last Nights 3 - 5 Nights at Ducks</title>
+<title>Last Nights 3 — 5 Nights at Ducks</title>
 <style>
-  *{box-sizing:border-box}
-  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#070809;color:#eee;font:14px monospace}
-  canvas{position:fixed;inset:0;display:block}
-  #hud{position:fixed;z-index:3;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:10px;text-shadow:2px 2px #000;pointer-events:none}
-  .panel{background:#08090ddd;border:1px solid #777;padding:9px 12px}
-  #brand{font-weight:bold;letter-spacing:2px}
-  #stats{display:flex;gap:14px;flex-wrap:wrap}
-  #crosshair{position:fixed;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;text-shadow:0 0 5px black}
-  #prompt{position:fixed;z-index:3;left:50%;top:59%;transform:translate(-50%,-50%);display:none;padding:10px 14px;background:#08090eee;border:1px solid #aaa;pointer-events:none}
-  #help{position:fixed;z-index:3;bottom:12px;left:50%;transform:translateX(-50%);text-align:center;max-width:96%;pointer-events:none}
-  #overlay{position:fixed;inset:0;z-index:6;display:grid;place-items:center;background:#000d;padding:20px;text-align:center}
-  #card{max-width:620px;background:#111;border:2px solid #777;padding:28px}
-  #card h1{letter-spacing:3px;line-height:1.35}
-  #card p{color:#ccc;line-height:1.7}
-  button{background:#34383b;border:1px solid #aaa;color:white;padding:11px 16px;font:inherit;cursor:pointer}
-  button:hover{background:#50565a}
-  #cameraUI{position:fixed;z-index:5;inset:8%;display:none;text-align:center;padding:18px;background:#080b0eee;border:3px solid #aaa;pointer-events:none}
-  #cameraUI button{pointer-events:auto}
-  #feedText{margin:25px auto;color:#ccd4d1}
-  #feeds{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
-  .hidden{display:none!important}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111;color:#eee;font:14px monospace}
+canvas{position:fixed;inset:0;display:block}
+#hud{position:fixed;z-index:3;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:10px;text-shadow:2px 2px #000;pointer-events:none}
+.panel{background:#08090ddd;border:1px solid #777;padding:9px 12px}
+#brand{font-weight:bold;letter-spacing:2px}
+#stats{display:flex;gap:14px;flex-wrap:wrap}
+#crosshair{position:fixed;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none}
+#prompt{position:fixed;z-index:3;left:50%;top:59%;transform:translate(-50%,-50%);display:none;padding:10px 14px;background:#08090eee;border:1px solid #aaa;pointer-events:none}
+#help{position:fixed;z-index:3;bottom:12px;left:50%;transform:translateX(-50%);text-align:center;max-width:96%;pointer-events:none}
+#overlay{position:fixed;inset:0;z-index:6;display:grid;place-items:center;background:#000c;padding:20px;text-align:center}
+#card{max-width:640px;background:#111;border:2px solid #777;padding:28px}
+#card h1{letter-spacing:3px;line-height:1.35}
+#card p{color:#ccc;line-height:1.7}
+button{background:#34383b;border:1px solid #aaa;color:white;padding:10px 15px;font:inherit;cursor:pointer}
+button:hover{background:#50565a}
+#cameraUI{position:fixed;z-index:5;inset:8%;display:none;text-align:center;padding:18px;background:#080b0eee;border:3px solid #aaa}
+#feedText{margin:25px auto;color:#ccd4d1}
+#feeds{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
 </style>
 </head>
 <body>
 <div id="hud">
-  <div id="brand" class="panel">LAST NIGHTS 3 - 5 NIGHTS AT DUCKS</div>
+  <div id="brand" class="panel">LAST NIGHTS 3 — 5 NIGHTS AT DUCKS</div>
   <div id="stats" class="panel">
     <span>NIGHT <b id="night">1</b></span>
     <span>TIME <b id="time">12 AM</b></span>
     <span>POWER <b id="power">100%</b></span>
-    <span>LIGHT <b id="lightState">OFF</b></span>
+    <span>HANDS <b id="held">EMPTY</b></span>
   </div>
 </div>
 <div id="crosshair">+</div>
 <div id="prompt"></div>
-<div id="help" class="panel">WASD move · Mouse look · F flashlight · E interact · Click game to capture mouse · ESC unlocks</div>
+<div id="help" class="panel">WASD move · Mouse look · F flashlight · E use · Right-click pickup/drop · Left-click throw · Esc unlock</div>
 
 <div id="cameraUI">
   <h2 id="feedTitle">SECURITY CAMERAS</h2>
   <div id="feedText">Select a camera feed.</div>
   <div id="feeds"></div>
-  <p>Press E or ESC to close the monitor</p>
+  <p>Press E or Esc to close</p>
 </div>
 
 <div id="overlay">
   <div id="card">
     <h1>LAST NIGHTS 3<br>5 NIGHTS AT DUCKS</h1>
-    <p>Survive until 6 AM. Walk the office, watch the cameras, use your flashlight, and keep the doors shut when the animatronic approaches. Every action consumes power.</p>
-    <p>WASD to move · Mouse to look · F flashlight · E to interact. Click the game to capture the mouse.</p>
-    <button id="startButton" type="button">START SHIFT</button>
+    <p>Survive until 6 AM. Explore the office, collect objects, and keep the animatronic away. Closed doors block both you and the duck, but drain power.</p>
+    <p>WASD movement works without pointer lock. Click the scene to enable mouse look. Right-click to pick up or drop items; left-click to throw a held item.</p>
+    <button id="startButton">START SHIFT</button>
   </div>
 </div>
 
@@ -63,8 +61,8 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 
 const $=id=>document.getElementById(id);
 const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x080a0d);
-scene.fog=new THREE.FogExp2(0x080a0d,.032);
+scene.background=new THREE.Color(0x171a1c);
+scene.fog=new THREE.FogExp2(0x171a1c,.022);
 
 const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,100);
 camera.position.set(0,1.65,5);
@@ -77,97 +75,87 @@ renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.12;
+renderer.toneMappingExposure=1.2;
 document.body.prepend(renderer.domElement);
 
-// Full-screen WebGL post-processing shader: vignette, scan lines, and subtle color separation.
+// Full-screen shader adds scanlines, vignette, and faint chromatic aberration.
 const postScene=new THREE.Scene();
 const postCamera=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
 const renderTarget=new THREE.WebGLRenderTarget(innerWidth,innerHeight,{
   minFilter:THREE.LinearFilter,maxFilter:THREE.LinearFilter,
   format:THREE.RGBAFormat,depthBuffer:true
 });
-const shaderMaterial=new THREE.ShaderMaterial({
+const shaderMat=new THREE.ShaderMaterial({
   uniforms:{
     tDiffuse:{value:renderTarget.texture},
     resolution:{value:new THREE.Vector2(innerWidth,innerHeight)},
     time:{value:0},
-    intensity:{value:1}
+    effect:{value:1}
   },
-  vertexShader:`
-    varying vec2 vUv;
-    void main(){
-      vUv=uv;
-      gl_Position=vec4(position,1.0);
-    }
-  `,
+  vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position,1.0);}`,
   fragmentShader:`
     uniform sampler2D tDiffuse;
     uniform vec2 resolution;
     uniform float time;
-    uniform float intensity;
+    uniform float effect;
     varying vec2 vUv;
-
     void main(){
-      vec2 uv=vUv;
-      float shift=(0.0007+0.0005*sin(time*1.7))*intensity;
-      float r=texture2D(tDiffuse,uv+vec2(shift,0.0)).r;
-      float g=texture2D(tDiffuse,uv).g;
-      float b=texture2D(tDiffuse,uv-vec2(shift,0.0)).b;
-      vec3 color=vec3(r,g,b);
-      float scan=0.975+0.025*sin(uv.y*resolution.y*1.25);
-      float dist=distance(uv,vec2(.5));
-      float vignette=1.0-smoothstep(.28,.78,dist)*.48;
-      float noise=fract(sin(dot(uv*resolution+time,vec2(12.9898,78.233)))*43758.5453);
-      color*=scan*vignette;
-      color+=(noise-.5)*.018*intensity;
-      gl_FragColor=vec4(color,1.0);
-    }
-  `
+      float shift=(0.00035+0.0002*sin(time*1.8))*effect;
+      vec3 c=vec3(
+        texture2D(tDiffuse,vUv+vec2(shift,0.0)).r,
+        texture2D(tDiffuse,vUv).g,
+        texture2D(tDiffuse,vUv-vec2(shift,0.0)).b
+      );
+      float scan=.985+.015*sin(vUv.y*resolution.y*1.1);
+      float vignette=1.0-smoothstep(.3,.78,distance(vUv,vec2(.5)))*.32;
+      c*=scan*vignette;
+      gl_FragColor=vec4(c,1.0);
+    }`
 });
-postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),shaderMaterial));
+postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),shaderMat));
 
-function tex(base,colors,seed=1){
-  const c=document.createElement("canvas");c.width=c.height=128;
-  const x=c.getContext("2d");x.fillStyle=base;x.fillRect(0,0,128,128);
-  let n=seed;const rand=()=>{n=(n*1664525+1013904223)>>>0;return n/4294967296};
-  for(let i=0;i<1000;i++){
-    x.globalAlpha=.15+rand()*.27;
-    x.fillStyle=colors[Math.floor(rand()*colors.length)];
-    const s=2+Math.floor(rand()*9);
-    x.fillRect(Math.floor(rand()*128),Math.floor(rand()*128),s,s);
+function makeTexture(base,colors,seed=1){
+  const canvas=document.createElement("canvas");canvas.width=canvas.height=128;
+  const ctx=canvas.getContext("2d");ctx.fillStyle=base;ctx.fillRect(0,0,128,128);
+  let n=seed;
+  const rand=()=>{n=(n*1664525+1013904223)>>>0;return n/4294967296};
+  for(let i=0;i<750;i++){
+    ctx.globalAlpha=.12+rand()*.2;
+    ctx.fillStyle=colors[Math.floor(rand()*colors.length)];
+    const s=2+Math.floor(rand()*8);
+    ctx.fillRect(Math.floor(rand()*128),Math.floor(rand()*128),s,s);
   }
-  x.globalAlpha=1;
-  const t=new THREE.CanvasTexture(c);
-  t.magFilter=THREE.NearestFilter;
-  t.minFilter=THREE.NearestMipmapNearestFilter;
-  t.colorSpace=THREE.SRGBColorSpace;
-  return t;
+  ctx.globalAlpha=1;
+  const tex=new THREE.CanvasTexture(canvas);
+  tex.colorSpace=THREE.SRGBColorSpace;
+  tex.magFilter=THREE.NearestFilter;
+  return tex;
 }
-const wallMat=new THREE.MeshStandardMaterial({map:tex("#4b4942",["#333633","#625d50","#555049"],3),roughness:1});
-const floorMat=new THREE.MeshStandardMaterial({map:tex("#302d28",["#242523","#453e34","#353733"],9),roughness:1});
-const woodMat=new THREE.MeshStandardMaterial({map:tex("#594532",["#382e23","#796042","#57412e"],15),roughness:1});
-const metalMat=new THREE.MeshStandardMaterial({color:0x565b5a,metalness:.5,roughness:.55});
-const darkMat=new THREE.MeshStandardMaterial({color:0x171b1b,roughness:1});
-const screenMat=new THREE.MeshBasicMaterial({color:0x16332e});
-const duckMat=new THREE.MeshStandardMaterial({color:0x80613b,roughness:.8,metalness:.12});
-const beakMat=new THREE.MeshStandardMaterial({color:0xb66a28,roughness:.65});
-const eyeMat=new THREE.MeshStandardMaterial({color:0xff2814,emissive:0xd01808,emissiveIntensity:2});
-
+const wallMat=new THREE.MeshStandardMaterial({map:makeTexture("#514f48",["#393b38","#6a6253","#58544c"]),roughness:1});
+const floorMat=new THREE.MeshStandardMaterial({map:makeTexture("#37332d",["#262725","#484136","#393832"],7),roughness:1});
+const woodMat=new THREE.MeshStandardMaterial({map:makeTexture("#624a33",["#423323","#795d3d","#503a29"],13),roughness:.88});
+const metalMat=new THREE.MeshStandardMaterial({color:0x747b79,metalness:.35,roughness:.6});
+const darkMat=new THREE.MeshStandardMaterial({color:0x202423,roughness:.9});
+const duckMat=new THREE.MeshStandardMaterial({color:0x967342,roughness:.8});
+const beakMat=new THREE.MeshStandardMaterial({color:0xc77b2d,roughness:.65});
+const eyeMat=new THREE.MeshStandardMaterial({color:0xff2710,emissive:0xc01808,emissiveIntensity:2});
 const colliders=[];
 const interactables=[];
+const worldItems=[];
+const thrownItems=[];
+
 function box(name,x,y,z,sx,sy,sz,material,{collide=true,interact=null}={}){
-  const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),material);
-  m.name=name;m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;
-  m.userData.interact=interact;
-  scene.add(m);
-  if(collide)colliders.push({mesh:m,halfX:sx/2,halfZ:sz/2});
-  if(interact)interactables.push(m);
-  return m;
+  const mesh=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),material);
+  mesh.name=name;mesh.position.set(x,y,z);
+  mesh.castShadow=true;mesh.receiveShadow=true;
+  mesh.userData.interact=interact;
+  scene.add(mesh);
+  if(collide)colliders.push({mesh,halfX:sx/2,halfZ:sz/2});
+  if(interact)interactables.push(mesh);
+  return mesh;
 }
 
-// Office room and hallway. Door openings have solid side walls and a lintel;
-// closing a door adds a collision panel across the opening.
+// Main office and back hallway.
 box("floor",0,-.15,0,18,.3,22,floorMat);
 box("ceiling",0,5,0,18,.25,22,darkMat);
 box("back wall",0,2.4,-11,18,4.8,.35,wallMat);
@@ -178,26 +166,22 @@ box("hall back",0,2.4,-19.5,5,4.8,.3,darkMat);
 box("hall left",-2.5,2.4,-15,.25,4.8,9,darkMat);
 box("hall right",2.5,2.4,-15,.25,4.8,9,darkMat);
 
-// Side-door portals: wall sections leave the center open for a door.
+// Door openings in side walls.
 for(const side of ["left","right"]){
   const x=side==="left"?-6:6;
-  box(side+" doorway wall upper",x,4.35,-1.5,6,1.1,.4,wallMat);
-  box(side+" doorway wall lower",x,.3,-1.5,6,.6,.4,wallMat);
+  box(`${side} doorway upper`,x,4.25,-1.5,6,1.3,.4,wallMat);
+  box(`${side} doorway lower`,x,.25,-1.5,6,.5,.4,wallMat);
 }
-const doorState={left:true,right:true};
+const doors={left:true,right:true};
 const doorMeshes={};
 for(const side of ["left","right"]){
   const x=side==="left"?-6:6;
-  const panel=box(side+" security door",x,2.3,-1.5,2.8,3.4,.24,woodMat,{collide:false,interact:{type:"door",side}});
-  doorMeshes[side]=panel;
-  // Door panels are included in movement collision only while closed.
-  panel.userData.closed=true;
+  const d=box(`${side} security door`,x,2.25,-1.5,2.8,3.5,.24,woodMat,{collide:false,interact:{type:"door",side}});
+  doorMeshes[side]=d;
 }
 
-// Wall detail, cabinets, and desk.
-for(let x=-7;x<=7;x+=2){
-  box("wall panel",x,2.4,-10.76,1.55,3.8,.08,darkMat,{collide:false});
-}
+// Wall decoration, desk, and camera terminal.
+for(let x=-7;x<=7;x+=2)box("wall panel",x,2.4,-10.77,1.55,3.8,.08,darkMat,{collide:false});
 box("cabinet",-7,1.2,-6,1.5,2.4,1.2,woodMat);
 box("shelf",7,2.6,-6,1.4,.14,2,metalMat);
 box("crate",6.8,.55,-6.3,1.1,1.1,1.1,woodMat);
@@ -205,16 +189,19 @@ box("desk top",0,1.1,2.6,6,.25,1.7,woodMat);
 box("desk front",0,.52,3.25,5.6,1.05,.25,darkMat);
 box("monitor stand",0,1.48,2.15,.25,.55,.25,metalMat,{collide:false});
 box("camera terminal",0,2.05,2.15,2.4,1.25,.18,darkMat,{collide:false,interact:{type:"camera"}});
-box("monitor screen",0,2.05,2.045,2.12,.94,.035,screenMat,{collide:false,interact:{type:"camera"}});
+box("monitor screen",0,2.05,2.045,2.12,.94,.035,new THREE.MeshBasicMaterial({color:0x22534a}),{collide:false,interact:{type:"camera"}});
 
-// Lights
-scene.add(new THREE.HemisphereLight(0x71808a,0x15110d,.65));
-const roomLight=new THREE.PointLight(0xbabea2,18,13);
-roomLight.position.set(0,4,2);roomLight.castShadow=true;scene.add(roomLight);
-const hallLight=new THREE.PointLight(0x789189,8,10);
+// Brighter ambient and room lighting.
+scene.add(new THREE.HemisphereLight(0xb9c9d2,0x3c3024,1.2));
+const roomLight=new THREE.PointLight(0xffdfb0,32,24);
+roomLight.position.set(0,4.3,1.5);roomLight.castShadow=true;scene.add(roomLight);
+const fillLight=new THREE.PointLight(0x99b5c0,14,20);
+fillLight.position.set(-6,3,-4);scene.add(fillLight);
+const hallLight=new THREE.PointLight(0xacc8b7,14,14);
 hallLight.position.set(0,3,-8);scene.add(hallLight);
 
-const flashlight=new THREE.SpotLight(0xffefc9,0,22,Math.PI/8,.45,1.3);
+// Flashlight attached to the view.
+const flashlight=new THREE.SpotLight(0xfff1cf,0,24,Math.PI/7,.45,1.1);
 flashlight.castShadow=true;
 camera.add(flashlight);
 flashlight.position.set(0,0,0);
@@ -222,212 +209,273 @@ flashlight.target.position.set(0,0,-1);
 camera.add(flashlight.target);
 scene.add(camera);
 
-// Original blocky animatronic duck built from primitive geometry.
-const duck=new THREE.Group();
-function duckPart(geometry,material,pos,scale){
-  const m=new THREE.Mesh(geometry,material);
-  m.position.set(...pos);m.scale.set(...scale);m.castShadow=true;m.receiveShadow=true;
-  duck.add(m);return m;
+// Pickup objects.
+const itemDefs=[
+  {name:"Toy Duck",color:0xffc928,geometry:new THREE.SphereGeometry(.28,12,9),pos:[-4,.45,1]},
+  {name:"Tin Can",color:0x9da3a5,geometry:new THREE.CylinderGeometry(.18,.18,.42,12),pos:[4,.38,-3]},
+  {name:"Rubber Ball",color:0xd72c2c,geometry:new THREE.SphereGeometry(.23,14,10),pos:[-5,.4,-7]},
+  {name:"Wooden Block",color:0x54a7ce,geometry:new THREE.BoxGeometry(.42,.42,.42),pos:[5,.42,1]},
+  {name:"Old Plush",color:0x76513d,geometry:new THREE.BoxGeometry(.42,.5,.34),pos:[2,.45,-7]}
+];
+for(const def of itemDefs){
+  const mat=new THREE.MeshStandardMaterial({color:def.color,roughness:.75,metalness:def.name==="Tin Can"?.45:0});
+  const obj=new THREE.Mesh(def.geometry,mat);
+  obj.name=def.name;obj.position.set(...def.pos);
+  obj.castShadow=true;obj.receiveShadow=true;
+  obj.userData={isPickup:true,held:false,thrown:false,velocity:new THREE.Vector3(),home:obj.position.clone()};
+  scene.add(obj);worldItems.push(obj);
 }
-duckPart(new THREE.BoxGeometry(1,1,1),duckMat,[0,1.25,0],[.85,1,.55]); // torso
-duckPart(new THREE.BoxGeometry(1,1,1),duckMat,[0,2.15,0],[.72,.72,.68]); // head
-duckPart(new THREE.BoxGeometry(1,1,1),beakMat,[0,1.98,-.42],[.48,.23,.3]); // beak
-duckPart(new THREE.BoxGeometry(1,1,1),duckMat,[-.27,2.58,0],[.2,.48,.2]); // left feather
-duckPart(new THREE.BoxGeometry(1,1,1),duckMat,[.27,2.58,0],[.2,.48,.2]); // right feather
-duckPart(new THREE.BoxGeometry(.16,.16,.08),eyeMat,[-.2,2.25,-.355],[1,1,1]);
-duckPart(new THREE.BoxGeometry(.16,.16,.08),eyeMat,[.2,2.25,-.355],[1,1,1]);
-duckPart(new THREE.BoxGeometry(.28,.75,.3),duckMat,[-.55,1.1,0],[1,1,1]);
-duckPart(new THREE.BoxGeometry(.28,.75,.3),duckMat,[.55,1.1,0],[1,1,1]);
-duckPart(new THREE.BoxGeometry(.32,.35,.38),darkMat,[-.26,.35,0],[1,1,1]);
-duckPart(new THREE.BoxGeometry(.32,.35,.38),darkMat,[.26,.35,0],[1,1,1]);
-duck.position.set(0,0,-16);
-scene.add(duck);
 
+// Build a distinctive primitive animatronic.
+const duck=new THREE.Group();
+function duckPart(geo,mat,pos,scale){
+  const m=new THREE.Mesh(geo,mat);m.position.set(...pos);m.scale.set(...scale);
+  m.castShadow=true;m.receiveShadow=true;duck.add(m);return m;
+}
+duckPart(new THREE.BoxGeometry(1,1,1),duckMat,[0,1.2,0],[.85,1,.55]);
+duckPart(new THREE.BoxGeometry(1,1,1),duckMat,[0,2.08,0],[.72,.72,.68]);
+duckPart(new THREE.BoxGeometry(1,1,1),beakMat,[0,1.92,-.42],[.48,.23,.3]);
+duckPart(new THREE.BoxGeometry(1,1,1),duckMat,[-.27,2.5,0],[.2,.48,.2]);
+duckPart(new THREE.BoxGeometry(1,1,1),duckMat,[.27,2.5,0],[.2,.48,.2]);
+duckPart(new THREE.BoxGeometry(.16,.16,.08),eyeMat,[-.2,2.18,-.355],[1,1,1]);
+duckPart(new THREE.BoxGeometry(.16,.16,.08),eyeMat,[.2,2.18,-.355],[1,1,1]);
+duckPart(new THREE.BoxGeometry(.28,.75,.3),duckMat,[-.55,1.05,0],[1,1,1]);
+duckPart(new THREE.BoxGeometry(.28,.75,.3),duckMat,[.55,1.05,0],[1,1,1]);
+duckPart(new THREE.BoxGeometry(.32,.35,.38),darkMat,[-.26,.33,0],[1,1,1]);
+duckPart(new THREE.BoxGeometry(.32,.35,.38),darkMat,[.26,.33,0],[1,1,1]);
+duck.position.set(0,0,-16);scene.add(duck);
+
+// Camera monitor.
 const feeds=[
-  {name:"CAM 01 — OFFICE",text:"The office looks quiet. Keep an eye on the doors."},
-  {name:"CAM 02 — WEST HALL",text:"A long, dark corridor. The image flickers."},
-  {name:"CAM 03 — EAST HALL",text:"Something may be moving beyond the light."},
-  {name:"CAM 04 — STORAGE",text:"Boxes and shelves. Static crackles across the feed."},
-  {name:"CAM 05 — BACK ROOM",text:"The room is empty... for now."}
+  ["CAM 01 — OFFICE","The office looks quiet. Keep an eye on the doors."],
+  ["CAM 02 — WEST HALL","A dark corridor. The camera image flickers."],
+  ["CAM 03 — EAST HALL","The hallway is quiet... for now."],
+  ["CAM 04 — STORAGE","Boxes and shelves fill the room."],
+  ["CAM 05 — BACK ROOM","The image is grainy and hard to read."]
 ];
 feeds.forEach((feed,i)=>{
   const b=document.createElement("button");
   b.textContent=`CAM 0${i+1}`;
-  b.addEventListener("click",()=>{
-    $("feedTitle").textContent=feed.name;
-    $("feedText").textContent=feed.text;
-  });
+  b.addEventListener("click",()=>{$("feedTitle").textContent=feed[0];$("feedText").textContent=feed[1]});
   $("feeds").appendChild(b);
 });
 
 let started=false,locked=false,cameraOpen=false,flashOn=false;
-let yaw=0,pitch=0,elapsed=0,power=100,aiTimer=0;
-let duckStage=0,attackTimer=0;
+let yaw=0,pitch=0,elapsed=0,power=100,aiTimer=0,duckStage=0,attackTimer=0;
+let heldItem=null,nearby=null;
 const keys=new Set();
 const clock=new THREE.Clock();
-let nearby=null;
 
-function addDoorCollider(){
-  for(const side of ["left","right"]){
-    const d=doorMeshes[side];
-    d.userData.closed=doorState[side];
-  }
-}
-function circleHitsBox(x,z,r,c){
+function pointInsideCollider(x,z,r,c){
   const cx=THREE.MathUtils.clamp(x,c.mesh.position.x-c.halfX,c.mesh.position.x+c.halfX);
   const cz=THREE.MathUtils.clamp(z,c.mesh.position.z-c.halfZ,c.mesh.position.z+c.halfZ);
   return (x-cx)**2+(z-cz)**2<r*r;
 }
 function collidesAt(x,z,r=.32){
-  for(const c of colliders)if(circleHitsBox(x,z,r,c))return true;
+  for(const c of colliders)if(pointInsideCollider(x,z,r,c))return true;
   for(const side of ["left","right"]){
-    if(doorState[side]){
+    if(doors[side]){
       const d=doorMeshes[side];
-      const c={mesh:d,halfX:1.4,halfZ:.15};
-      if(circleHitsBox(x,z,r,c))return true;
+      if(Math.abs(x-d.position.x)<1.4+r&&Math.abs(z-d.position.z)<.15+r)return true;
     }
   }
-  // Animatronic is solid; it cannot be walked through.
-  if(Math.abs(x-duck.position.x)<.72+r && Math.abs(z-duck.position.z)<.48+r)return true;
+  if(Math.abs(x-duck.position.x)<.72+r&&Math.abs(z-duck.position.z)<.48+r)return true;
   return false;
 }
-
 function movePlayer(dt){
-  if(!locked||cameraOpen)return;
+  // Keyboard movement intentionally does not depend on pointer-lock state.
+  if(!started||cameraOpen)return;
   const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
   const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
-  const v=new THREE.Vector3();
-  if(keys.has("KeyW"))v.add(forward);
-  if(keys.has("KeyS"))v.sub(forward);
-  if(keys.has("KeyD"))v.add(right);
-  if(keys.has("KeyA"))v.sub(right);
-  if(v.lengthSq()===0)return;
-
-  v.normalize().multiplyScalar(3.8*dt);
-  const x=camera.position.x+v.x;
-  const z=camera.position.z+v.z;
-  if(!collidesAt(x,camera.position.z))camera.position.x=x;
-  if(!collidesAt(camera.position.x,z))camera.position.z=z;
-
+  const move=new THREE.Vector3();
+  if(keys.has("KeyW")||keys.has("ArrowUp"))move.add(forward);
+  if(keys.has("KeyS")||keys.has("ArrowDown"))move.sub(forward);
+  if(keys.has("KeyD")||keys.has("ArrowRight"))move.add(right);
+  if(keys.has("KeyA")||keys.has("ArrowLeft"))move.sub(right);
+  if(move.lengthSq()===0)return;
+  move.normalize().multiplyScalar(4*dt);
+  const nx=camera.position.x+move.x;
+  if(!collidesAt(nx,camera.position.z))camera.position.x=nx;
+  const nz=camera.position.z+move.z;
+  if(!collidesAt(camera.position.x,nz))camera.position.z=nz;
   camera.position.x=THREE.MathUtils.clamp(camera.position.x,-8.35,8.35);
-  camera.position.z=THREE.MathUtils.clamp(camera.position.z,-18.3,7.4);
+  camera.position.z=THREE.MathUtils.clamp(camera.position.z,-18.2,7.3);
   camera.position.y=1.65;
 }
 
-function playJumpScare(){
-  started=false;locked=false;cameraOpen=false;
-  $("cameraUI").style.display="none";
-  document.exitPointerLock?.();
-  duck.position.set(camera.position.x,0,camera.position.z-1.5);
-  duck.visible=true;
-  $("card").innerHTML="<h1>CAUGHT</h1><p>The duck found the office.</p><button id='again'>TRY AGAIN</button>";
-  $("overlay").classList.remove("hidden");
-  $("again").addEventListener("click",()=>location.reload());
+function cameraRay(){
+  const ray=new THREE.Raycaster();
+  ray.setFromCamera(new THREE.Vector2(0,0),camera);
+  return ray;
+}
+function updateInteraction(){
+  if(!started||cameraOpen){$("prompt").style.display="none";nearby=null;return}
+  const ray=cameraRay();
+  const hits=ray.intersectObjects(interactables,false);
+  const usable=hits.find(h=>h.distance<3.2);
+  if(usable){
+    nearby=usable.object;
+    const item=nearby.userData.interact;
+    $("prompt").textContent=item.type==="door"
+      ?`E — ${doors[item.side]?"Open":"Close"} ${item.side} door`
+      :"E — Use camera monitor";
+    $("prompt").style.display="block";
+    return;
+  }
+  nearby=null;
+  $("prompt").style.display="none";
 }
 
 function interact(){
   if(!started)return;
-  if(cameraOpen){closeCamera();return}
+  if(cameraOpen){cameraOpen=false;$("cameraUI").style.display="none";return}
   if(!nearby)return;
-  const item=nearby.userData.interact;
-  if(item.type==="camera"){
-    cameraOpen=true;
-    $("cameraUI").style.display="block";
+  const info=nearby.userData.interact;
+  if(info.type==="camera"){
+    cameraOpen=true;$("cameraUI").style.display="block";
     document.exitPointerLock?.();
-    return;
-  }
-  if(item.type==="door"){
-    doorState[item.side]=!doorState[item.side];
-    const d=doorMeshes[item.side];
-    d.visible=doorState[item.side];
+  }else if(info.type==="door"){
+    doors[info.side]=!doors[info.side];
+    doorMeshes[info.side].visible=doors[info.side];
     power=Math.max(0,power-1);
   }
 }
-function closeCamera(){
-  cameraOpen=false;
-  $("cameraUI").style.display="none";
+
+function setHeld(item){
+  heldItem=item;
+  item.userData.held=true;
+  item.userData.thrown=false;
+  item.userData.velocity.set(0,0,0);
+  $("held").textContent=item.name.toUpperCase();
 }
-function updateInteraction(){
-  if(cameraOpen){$("prompt").style.display="none";return}
-  const ray=new THREE.Raycaster();
-  ray.setFromCamera(new THREE.Vector2(0,0),camera);
-  const hits=ray.intersectObjects(interactables,false);
-  nearby=hits.length&&hits[0].distance<3.3?hits[0].object:null;
-  if(!nearby){$("prompt").style.display="none";return}
-  const item=nearby.userData.interact;
-  if(item.type==="door"){
-    $("prompt").textContent=`E — ${doorState[item.side]?"Open":"Close"} ${item.side} door`;
-  }else $("prompt").textContent="E — Use camera monitor";
-  $("prompt").style.display="block";
+function dropHeld(){
+  if(!heldItem)return;
+  const item=heldItem;
+  item.userData.held=false;
+  item.position.copy(camera.position);
+  const forward=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);
+  item.position.addScaledVector(forward,.8);
+  item.position.y=Math.max(.25,item.position.y-.65);
+  heldItem=null;
+  $("held").textContent="EMPTY";
+}
+function pickupOrDrop(){
+  if(!started||cameraOpen)return;
+  if(heldItem){dropHeld();return}
+  const ray=cameraRay();
+  const available=worldItems.filter(it=>!it.userData.held);
+  const hits=ray.intersectObjects(available,false);
+  if(hits.length&&hits[0].distance<3.2)setHeld(hits[0].object);
+}
+function throwHeld(){
+  if(!started||cameraOpen||!heldItem)return;
+  const item=heldItem;
+  item.userData.held=false;
+  item.userData.thrown=true;
+  item.position.copy(camera.position);
+  const dir=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion).normalize();
+  item.position.addScaledVector(dir,.8);
+  item.position.y-=.35;
+  item.userData.velocity.copy(dir).multiplyScalar(9);
+  item.userData.velocity.y+=2.2;
+  thrownItems.push(item);
+  heldItem=null;
+  $("held").textContent="EMPTY";
+}
+function updateHeld(){
+  if(!heldItem)return;
+  const offset=new THREE.Vector3(.38,-.32,-.72).applyQuaternion(camera.quaternion);
+  heldItem.position.copy(camera.position).add(offset);
+  heldItem.quaternion.copy(camera.quaternion);
+}
+
+function lose(){
+  if(!started)return;
+  started=false;locked=false;cameraOpen=false;
+  $("cameraUI").style.display="none";document.exitPointerLock?.();
+  $("card").innerHTML="<h1>CAUGHT</h1><p>The animatronic reached the office.</p><button id='again'>TRY AGAIN</button>";
+  $("overlay").style.display="grid";
+  $("again").addEventListener("click",()=>location.reload());
+}
+function win(){
+  if(!started)return;
+  started=false;document.exitPointerLock?.();
+  $("card").innerHTML="<h1>6 AM</h1><p>You survived the shift.</p><button id='again'>PLAY AGAIN</button>";
+  $("overlay").style.display="grid";
+  $("again").addEventListener("click",()=>location.reload());
 }
 
 function updateAI(dt){
   aiTimer+=dt;
-  const officeZ=-1.5;
-  const stages=[-16,-12,-8,-4,officeZ];
-  if(aiTimer>17){
+  const stops=[-16,-12,-8,-4,-1.5];
+  if(aiTimer>16){
     aiTimer=0;
-    // Camera monitoring briefly delays the animatronic, but does not stop it.
     if(!(cameraOpen&&Math.random()<.65))duckStage=Math.min(4,duckStage+1);
   }
-  const targetZ=stages[duckStage];
-  const direction=targetZ-duck.position.z;
-  duck.position.z+=Math.sign(direction)*Math.min(Math.abs(direction),dt*(duckStage>=3?1.05:.65));
-  duck.position.x=Math.sin(elapsed*.7)*.25;
-  duck.rotation.y=Math.PI+Math.sin(elapsed*1.3)*.06;
+  const target=stops[duckStage];
+  const delta=target-duck.position.z;
+  duck.position.z+=Math.sign(delta)*Math.min(Math.abs(delta),dt*(duckStage>=3?1:.65));
+  duck.position.x=Math.sin(elapsed*.7)*.2;
+  duck.rotation.y=Math.PI+Math.sin(elapsed*1.4)*.05;
 
   if(duckStage>=4){
-    const doorSide=duck.position.x<0?"left":"right";
-    if(doorState[doorSide]){
+    const side=duck.position.x<0?"left":"right";
+    if(doors[side]){
       attackTimer+=dt;
-      if(attackTimer>9)playJumpScare();
+      if(attackTimer>11)lose();
     }else{
-      attackTimer=0;
-      duckStage=2;
-      duck.position.z=-8;
-      power=Math.max(0,power-5);
+      attackTimer=0;duckStage=2;duck.position.z=-8;
+      power=Math.max(0,power-4);
     }
   }else attackTimer=0;
 }
-
-function updateTimeAndPower(dt){
-  if(!started)return;
-  elapsed+=dt;
-  const hour=Math.min(6,Math.floor(elapsed/45));
-  const drain=dt*(.12+(flashOn?.32:0)+(cameraOpen?.22:0)+((doorState.left||doorState.right)?.12:0));
-  power=Math.max(0,power-drain);
-
-  $("time").textContent=hour===0?"12 AM":`${hour} AM`;
-  $("power").textContent=`${Math.ceil(power)}%`;
-  $("lightState").textContent=flashOn?"ON":"OFF";
-  $("night").textContent="1";
-
-  roomLight.intensity=power>0?18:0;
-  hallLight.intensity=power>0?8:0;
-  flashlight.intensity=flashOn&&power>0?95:0;
-  shaderMaterial.uniforms.intensity.value=cameraOpen?.35:1;
-
-  if(power<=0){
-    flashOn=false;
-    doorState.left=false;
-    doorState.right=false;
-    $("lightState").textContent="OFF";
-    if(hour<6)playJumpScare();
-  }
-  if(hour>=6){
-    started=false;
-    document.exitPointerLock?.();
-    $("card").innerHTML="<h1>6 AM</h1><p>You survived the shift.</p><button id='again'>PLAY AGAIN</button>";
-    $("overlay").classList.remove("hidden");
-    $("again").addEventListener("click",()=>location.reload());
+function updateThrown(dt){
+  for(let i=thrownItems.length-1;i>=0;i--){
+    const item=thrownItems[i];
+    const v=item.userData.velocity;
+    v.y-=9.8*dt;
+    item.position.addScaledVector(v,dt);
+    item.rotation.x+=dt*5;item.rotation.z+=dt*4;
+    if(item.position.y<.25){
+      item.position.y=.25;
+      v.y=Math.abs(v.y)*.35;
+      v.x*=.72;v.z*=.72;
+      if(v.length()<1.1){v.set(0,0,0);item.userData.thrown=false;thrownItems.splice(i,1)}
+    }
+    if(item.userData.thrown&&Math.abs(item.position.x-duck.position.x)<1&&Math.abs(item.position.z-duck.position.z)<1){
+      // A thrown item briefly distracts the animatronic.
+      duckStage=Math.max(0,duckStage-1);
+      item.userData.velocity.set(0,0,0);
+      item.userData.thrown=false;
+    }
   }
 }
 
+function updateShift(dt){
+  if(!started)return;
+  elapsed+=dt;
+  const hour=Math.min(6,Math.floor(elapsed/45));
+  power=Math.max(0,power-dt*(.09+(flashOn?.24:0)+(cameraOpen?.16:0)+((doors.left||doors.right)?.08:0)));
+  $("time").textContent=hour===0?"12 AM":`${hour} AM`;
+  $("power").textContent=`${Math.ceil(power)}%`;
+  $("night").textContent="1";
+  roomLight.intensity=power>0?32:0;
+  fillLight.intensity=power>0?14:0;
+  hallLight.intensity=power>0?14:0;
+  flashlight.intensity=flashOn&&power>0?90:0;
+  shaderMat.uniforms.effect.value=cameraOpen?.3:1;
+  if(power<=0){
+    flashOn=false;doors.left=false;doors.right=false;
+    if(hour<6)lose();
+  }
+  if(hour>=6)win();
+}
+
 $("startButton").addEventListener("click",()=>{
-  started=true;elapsed=0;power=100;duckStage=0;aiTimer=0;
+  started=true;elapsed=0;power=100;duckStage=0;aiTimer=0;attackTimer=0;
   camera.position.set(0,1.65,5);
-  duck.position.set(0,0,-16);
-  $("overlay").classList.add("hidden");
+  yaw=0;pitch=0;camera.rotation.set(0,0,0);
+  $("overlay").style.display="none";
 });
 
 renderer.domElement.addEventListener("click",()=>{
@@ -443,36 +491,43 @@ document.addEventListener("mousemove",e=>{
   camera.rotation.set(pitch,yaw,0);
 });
 document.addEventListener("keydown",e=>{
+  if(["KeyW","KeyA","KeyS","KeyD","ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code))e.preventDefault();
   keys.add(e.code);
-  if(e.code==="KeyE")interact();
-  if(e.code==="KeyF"&&started&&!cameraOpen){
-    flashOn=!flashOn;
-    power=Math.max(0,power-.15);
-  }
-  if(e.code==="Escape"&&cameraOpen)closeCamera();
+  if(e.code==="KeyE"&&!e.repeat)interact();
+  if(e.code==="KeyF"&&!e.repeat&&started&&!cameraOpen)flashOn=!flashOn;
+  if(e.code==="Escape"&&cameraOpen){cameraOpen=false;$("cameraUI").style.display="none"}
 });
 document.addEventListener("keyup",e=>keys.delete(e.code));
 addEventListener("blur",()=>keys.clear());
+
+// Prevent the browser context menu so right-click can pick up/drop.
+renderer.domElement.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("mousedown",e=>{
+  if(e.button===2){e.preventDefault();pickupOrDrop()}
+  if(e.button===0&&started&&!cameraOpen){
+    if(heldItem)throwHeld();
+    else if(!locked)renderer.domElement.requestPointerLock?.();
+  }
+});
 
 addEventListener("resize",()=>{
   camera.aspect=innerWidth/innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(innerWidth,innerHeight);
   renderTarget.setSize(innerWidth,innerHeight);
-  shaderMaterial.uniforms.resolution.value.set(innerWidth,innerHeight);
+  shaderMat.uniforms.resolution.value.set(innerWidth,innerHeight);
 });
 
 function animate(){
   requestAnimationFrame(animate);
   const dt=Math.min(clock.getDelta(),.05);
   movePlayer(dt);
-  if(started){
-    updateTimeAndPower(dt);
-    if(started)updateAI(dt);
-  }
+  updateHeld();
+  updateThrown(dt);
+  if(started){updateShift(dt);if(started)updateAI(dt)}
   updateInteraction();
 
-  shaderMaterial.uniforms.time.value=performance.now()*.001;
+  shaderMat.uniforms.time.value=performance.now()*.001;
   renderer.setRenderTarget(renderTarget);
   renderer.render(scene,camera);
   renderer.setRenderTarget(null);
