@@ -3,332 +3,354 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Last Nights 3</title>
+<title>Night Shift</title>
 <style>
-:root{
-  color-scheme:dark;
-  --bg:#08090b;
-  --panel:#111418;
-  --line:#434950;
-  --text:#e4e5e6;
-  --muted:#9ba1a7;
-  --red:#d44646;
-  --green:#83c48c;
-  --amber:#e7bd66;
-}
-*{box-sizing:border-box}
-body{margin:0;background:#030405;color:var(--text);font:15px/1.4 monospace}
-button{color:var(--text);font:inherit;background:#20252a;border:1px solid #5a626a;padding:10px 14px;cursor:pointer}
-button:hover{background:#343b42}
-button:disabled{opacity:.5;cursor:not-allowed}
-#app{min-height:100vh;display:grid;place-items:center;padding:16px}
-.frame{width:min(1100px,100%);border:1px solid #41464b;background:#101214;box-shadow:0 0 50px #000}
-header{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:12px 16px;background:#08090a;border-bottom:1px solid #333}
-h1{margin:0;font-size:20px;letter-spacing:3px}
-.hud{display:flex;gap:18px;flex-wrap:wrap;color:#cbd0d3}
-.hud b{color:white}
-#scene{height:min(58vh,510px);min-height:350px;position:relative;overflow:hidden;background:#0b0d0f}
-.office-bg{position:absolute;inset:0;background:
- radial-gradient(ellipse at 50% 48%,#343638 0,#1b1e20 35%,#0b0d0f 78%);
-}
-.ceiling{position:absolute;left:12%;right:12%;top:0;height:16%;background:#111315;border-bottom:3px solid #414244}
-.floor{position:absolute;bottom:0;left:0;right:0;height:32%;background:repeating-linear-gradient(90deg,#242628 0 90px,#1d1f21 90px 180px)}
-.desk{position:absolute;bottom:0;left:21%;width:58%;height:27%;background:linear-gradient(#484644,#262525 30%,#101112);clip-path:polygon(4% 0,96% 0,100% 100%,0 100%)}
-.monitor{position:absolute;bottom:24%;left:47%;width:6%;height:14%;border:3px solid #64696c;background:#060809}
-.door{position:absolute;top:15%;height:67%;width:17%;border:5px solid #45484a;background:#050607;z-index:2;transition:background .15s}
-#leftDoor{left:0} #rightDoor{right:0}
-.door.closed{background:repeating-linear-gradient(0deg,#25282a 0 22px,#35383a 22px 25px)}
-.hall{position:absolute;top:23%;height:50%;width:14%;background:#000;z-index:1}
-#leftHall{left:16%} #rightHall{right:16%}
-.enemy{display:none;position:absolute;z-index:3;bottom:16%;font-size:clamp(60px,10vw,115px);filter:drop-shadow(0 0 10px #c00);animation:shake .12s infinite}
-#enemyL{left:2%} #enemyR{right:2%}
-@keyframes shake{50%{transform:translateX(3px)}}
-#flash{position:absolute;inset:0;background:#fff1a6;opacity:0;z-index:4;pointer-events:none;mix-blend-mode:screen}
-#static{position:absolute;inset:0;z-index:5;display:none;background:repeating-linear-gradient(0deg,#aaa2 0 1px,transparent 1px 4px);pointer-events:none}
-.message{position:absolute;z-index:6;left:50%;top:12px;transform:translateX(-50%);text-align:center;color:#ff7777;text-shadow:0 0 8px #f00;max-width:92%}
-#cameraView{position:absolute;inset:0;z-index:5;display:none;padding:20px;background:radial-gradient(#272b2e,#070809);text-align:center}
-#cameraView h2{letter-spacing:4px}
-.camArt{height:58%;display:grid;place-items:center;font-size:clamp(60px,12vw,130px);color:#aeb2b4;text-shadow:0 0 12px #aaa}
-.camInfo{color:#c2c5c6}
-.buttons{display:flex;justify-content:space-between;gap:10px;padding:12px;flex-wrap:wrap;background:#0a0b0c}
-.buttons section{display:flex;gap:8px;flex-wrap:wrap}
-#footer{padding:0 16px 12px;display:flex;justify-content:space-between;gap:12px;color:var(--muted)}
-#overlay{position:absolute;inset:0;z-index:10;display:grid;place-items:center;background:#030405ed;padding:20px;text-align:center}
-#overlay .card{max-width:620px}
-#overlay h2{font-size:clamp(28px,6vw,46px);letter-spacing:5px;margin:0 0 14px}
-#overlay p{color:#c0c3c5}
-#overlay button{margin-top:14px;padding:12px 22px}
-.card .small{font-size:13px;color:#92989d}
-.hidden{display:none!important}
-#powerBar{display:inline-block;width:90px;height:10px;border:1px solid #93999e;vertical-align:middle;margin-left:6px}
-#powerFill{height:100%;width:100%;background:var(--green)}
-#camMap{position:absolute;right:12px;bottom:12px;display:none;z-index:7;gap:5px;flex-wrap:wrap;max-width:250px}
-#camMap button{padding:6px 8px;font-size:12px}
-#camMap button.selected{border-color:var(--amber);color:var(--amber)}
-@media(max-width:650px){
- header{align-items:flex-start;flex-direction:column}
- .hud{gap:9px;font-size:13px}
- #scene{min-height:330px}
- .buttons{justify-content:center}
- .buttons section{justify-content:center}
- #footer{font-size:12px}
-}
+  *{box-sizing:border-box}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08090b;color:#e8e8e8;font:14px monospace}
+  canvas{display:block;image-rendering:pixelated}
+  #hud{position:fixed;inset:12px 14px auto;z-index:2;display:flex;justify-content:space-between;pointer-events:none;text-shadow:2px 2px #000}
+  #readout{display:flex;gap:16px;background:#08090bcc;padding:9px 12px;border:1px solid #777}
+  #help{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:2;text-align:center;background:#08090bcc;border:1px solid #777;padding:9px 14px;pointer-events:none}
+  #prompt{position:fixed;left:50%;top:58%;transform:translate(-50%,-50%);z-index:3;color:#fff;background:#08090ddd;padding:10px 14px;display:none}
+  #crosshair{position:fixed;left:50%;top:50%;z-index:2;transform:translate(-50%,-50%);color:#fff;text-shadow:0 0 4px #000;pointer-events:none}
+  #overlay{position:fixed;inset:0;z-index:5;display:grid;place-items:center;background:#000c;text-align:center;padding:20px}
+  #card{max-width:540px;background:#111;padding:28px;border:2px solid #777}
+  #card h1{letter-spacing:5px}
+  #card p{color:#ccc;line-height:1.7}
+  button{font:inherit;color:white;background:#34383b;border:1px solid #aaa;padding:12px 20px;cursor:pointer}
+  button:hover{background:#50565a}
+  #cam{position:fixed;inset:8%;z-index:4;display:none;border:3px solid #aaa;background:#080b0bdd;padding:18px;text-align:center;pointer-events:none}
+  #cam h2{letter-spacing:4px}
+  #camMap{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:24px}
+  #camMap button{pointer-events:auto}
+  #camDescription{font-size:18px;margin-top:40px;color:#c9d2d0}
+  .hidden{display:none!important}
 </style>
 </head>
 <body>
-<div id="app">
-<div class="frame">
-  <header>
-    <h1>LAST NIGHTS 3</h1>
-    <div class="hud">
-      <span>Night <b id="night">1</b></span>
-      <span>Time <b id="time">12 AM</b></span>
-      <span>Power <b id="powerText">100%</b><i id="powerBar"><i id="powerFill"></i></i></span>
-      <span>Usage <b id="usage">▮</b></span>
-    </div>
-  </header>
-
-  <main id="scene">
-    <div class="office-bg"></div><div class="ceiling"></div>
-    <div id="leftHall" class="hall"></div><div id="rightHall" class="hall"></div>
-    <div id="leftDoor" class="door"></div><div id="rightDoor" class="door"></div>
-    <div class="floor"></div><div class="desk"></div><div class="monitor"></div>
-    <div id="enemyL" class="enemy">🐻</div><div id="enemyR" class="enemy">🐰</div>
-    <div id="flash"></div><div id="static"></div>
-    <div id="officeMessage" class="message"></div>
-
-    <div id="cameraView">
-      <h2 id="camName">CAM 01 — STAGE</h2>
-      <div class="camArt" id="camArt">📹</div>
-      <div class="camInfo" id="camInfo">The feed hisses with static.</div>
-    </div>
-    <div id="camMap"></div>
-
-    <div id="overlay">
-      <div class="card">
-        <h2 id="overlayTitle">LAST NIGHTS 3</h2>
-        <p id="overlayText">You are the overnight guard. Survive until 6 AM. Check the cameras, use the hall lights, and close a door only when danger is close. Everything drains power.</p>
-        <p class="small">Controls: A / D doors · Q / E lights · Space cameras · arrow keys switch camera feeds</p>
-        <button id="startButton">START NIGHT</button>
-      </div>
-    </div>
-  </main>
-
-  <div class="buttons">
-    <section>
-      <button id="leftDoorButton">Close Left Door [A]</button>
-      <button id="leftLightButton">Left Light [Q]</button>
-    </section>
-    <section>
-      <button id="cameraButton">Open Cameras [Space]</button>
-      <button id="rightLightButton">Right Light [E]</button>
-      <button id="rightDoorButton">Close Right Door [D]</button>
-    </section>
+<div id="hud">
+  <strong>NIGHT SHIFT</strong>
+  <div id="readout">
+    <span>TIME <b id="time">12 AM</b></span>
+    <span>POWER <b id="power">100%</b></span>
   </div>
-  <div id="footer"><span id="status">Office — keep an eye on the halls.</span><span>Survive until 6 AM</span></div>
 </div>
+<div id="crosshair">+</div>
+<div id="prompt"></div>
+<div id="help">WASD move · Mouse look · E interact · Click to lock mouse · ESC unlocks</div>
+
+<div id="cam">
+  <h2 id="camTitle">SECURITY CAMERAS</h2>
+  <div id="camDescription">Select a camera feed.</div>
+  <div id="camMap"></div>
+  <p>Press E or ESC to close monitor</p>
 </div>
 
-<script>
-(() => {
-  "use strict";
-  const $ = id => document.getElementById(id);
-  const cameras = [
-    {name:"CAM 01 — STAGE", icon:"🎭", text:"A dusty stage. The curtains barely move."},
-    {name:"CAM 02 — DINING ROOM", icon:"🍽️", text:"Tables sit empty beneath flickering lights."},
-    {name:"CAM 03 — STORAGE", icon:"📦", text:"Old props and spare parts fill the room."},
-    {name:"CAM 04 — WEST HALL", icon:"🚪", text:"A long, dark hallway leads toward your office."},
-    {name:"CAM 05 — EAST HALL", icon:"🚪", text:"The far end of the corridor is lost in darkness."},
-    {name:"CAM 06 — BACK ROOM", icon:"🔧", text:"A camera feed crackles in the back room."}
-  ];
+<div id="overlay">
+  <div id="card">
+    <h1>NIGHT SHIFT</h1>
+    <p>Explore the security office in first person. Use the terminals, inspect the doors, and conserve power. This is an original Minecraft-inspired horror-game starting point.</p>
+    <p>Click start, then click the scene to control the mouse. Move with WASD; look around with the mouse; press E near objects to interact.</p>
+    <button id="start">START SHIFT</button>
+  </div>
+</div>
 
-  let running=false, night=1, power=100, hour=0;
-  let leftClosed=false, rightClosed=false, cameraOpen=false, selectedCam=0;
-  let enemies, timers=[], attackTimeouts=[], blackout=false, lastPowerUsage="▮";
-  const officeMessage=$("officeMessage");
+<script type="module">
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 
-  function message(text){ officeMessage.textContent=text; }
-  function clearTimers(){
-    timers.forEach(clearInterval); timers=[];
-    attackTimeouts.forEach(clearTimeout); attackTimeouts=[];
+const $ = id => document.getElementById(id);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x101317);
+scene.fog = new THREE.Fog(0x101317, 8, 34);
+
+const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 100);
+camera.position.set(0, 1.65, 5);
+
+const renderer = new THREE.WebGLRenderer({antialias:false});
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(1);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+const mat = (color, roughness=1) => new THREE.MeshStandardMaterial({color, roughness});
+const materials = {
+  wall:mat(0x55524a), darkWall:mat(0x282a29), floor:mat(0x37332d),
+  metal:mat(0x626463), black:mat(0x111313), wood:mat(0x514233),
+  green:mat(0x315640), red:mat(0x8a2824), screen:mat(0x254b48),
+  gold:mat(0x8d713c)
+};
+
+function pixelTexture(base, colors, seed=1) {
+  const size=128, canvas=document.createElement("canvas");
+  canvas.width=canvas.height=size;
+  const ctx=canvas.getContext("2d");
+  ctx.fillStyle=base;ctx.fillRect(0,0,size,size);
+  let n=seed;
+  const rand=()=>{n=(n*1664525+1013904223)>>>0;return n/4294967296};
+  for(let i=0;i<1100;i++){
+    ctx.globalAlpha=.18+rand()*.28;
+    ctx.fillStyle=colors[Math.floor(rand()*colors.length)];
+    const side=2+Math.floor(rand()*9);
+    ctx.fillRect(Math.floor(rand()*size),Math.floor(rand()*size),side,side);
   }
-  function setIntervalGame(fn, ms){ timers.push(setInterval(fn, ms)); }
-  function setTimeoutGame(fn, ms){ attackTimeouts.push(setTimeout(fn, ms)); }
-
-  function makeEnemies(){
-    return [
-      {name:"Marlow", icon:"🐻", side:"left", route:[0,1,2,3], pos:0, aggression:0.22},
-      {name:"Patch", icon:"🐰", side:"right", route:[5,1,4], pos:0, aggression:0.27}
-    ];
-  }
-
-  function render(){
-    $("night").textContent=night;
-    $("time").textContent=hour===0?"12 AM":hour+" AM";
-    $("powerText").textContent=Math.ceil(power)+"%";
-    $("powerFill").style.width=Math.max(0,power)+"%";
-    $("powerFill").style.background=power<20?"#d44646":power<45?"#e7bd66":"#83c48c";
-    const usage=1+(leftClosed?1:0)+(rightClosed?1:0)+(cameraOpen?1:0);
-    $("usage").textContent="▮".repeat(Math.min(usage,4));
-    $("leftDoor").classList.toggle("closed",leftClosed);
-    $("rightDoor").classList.toggle("closed",rightClosed);
-    $("enemyL").style.display=enemies.some(e=>e.side==="left"&&e.pos===e.route.length-1)?"block":"none";
-    $("enemyR").style.display=enemies.some(e=>e.side==="right"&&e.pos===e.route.length-1)?"block":"none";
-    $("cameraView").style.display=cameraOpen?"block":"none";
-    $("camMap").style.display=cameraOpen?"flex":"none";
-    $("cameraButton").textContent=cameraOpen?"Close Cameras [Space]":"Open Cameras [Space]";
-    $("static").style.display=cameraOpen?"block":"none";
-    $("camName").textContent=cameras[selectedCam].name;
-    $("camArt").textContent=cameras[selectedCam].icon;
-    const sightings=enemies.filter(e=>e.route[e.pos]===selectedCam);
-    $("camInfo").textContent=sightings.length
-      ? `MOTION DETECTED: ${sightings.map(e=>e.name).join(", ")}`
-      : cameras[selectedCam].text;
-    $("camMap").innerHTML=cameras.map((cam,i)=>
-      `<button data-cam="${i}" class="${selectedCam===i?"selected":""}">CAM ${String(i+1).padStart(2,"0")}</button>`
-    ).join("");
-    $("camMap").querySelectorAll("button").forEach(button=>{
-      button.onclick=()=>{selectedCam=Number(button.dataset.cam);render()};
-    });
-    $("status").textContent=cameraOpen?`Camera monitor — ${cameras[selectedCam].name}`:"Office — listen for movement.";
-  }
-
-  function begin(){
-    clearTimers();
-    running=true;power=100;hour=0;leftClosed=false;rightClosed=false;
-    cameraOpen=false;blackout=false;enemies=makeEnemies();
-    $("overlay").classList.add("hidden");
-    $("flash").style.opacity="0";
-    message("");
-    render();
-
-    // Each in-game hour is 40 seconds: a complete shift lasts four minutes.
-    setIntervalGame(()=>{
-      if(!running)return;
-      hour++;
-      if(hour>=6){finish(true);return}
-      render();
-    },40000);
-
-    setIntervalGame(moveEnemies,4500);
-    setIntervalGame(drainPower,1000);
-  }
-
-  function moveEnemies(){
-    if(!running||blackout)return;
-    enemies.forEach(enemy=>{
-      const chance=Math.min(.82,enemy.aggression+(night-1)*.055+hour*.025);
-      if(Math.random()>chance)return;
-
-      if(enemy.pos<enemy.route.length-1){
-        enemy.pos++;
-      }else{
-        const blocked=enemy.side==="left"?leftClosed:rightClosed;
-        if(blocked){
-          enemy.pos=Math.max(0,enemy.pos-2);
-          message(`A heavy impact shakes the ${enemy.side} door!`);
-          setTimeoutGame(()=>{if(running)message("")},1400);
-        }else{
-          message(`Movement at the ${enemy.side} door!`);
-          const timeout=setTimeout(()=>{if(running&&! (enemy.side==="left"?leftClosed:rightClosed))finish(false)},2200);
-          attackTimeouts.push(timeout);
-        }
-      }
-    });
-    render();
-  }
-
-  function drainPower(){
-    if(!running||blackout)return;
-    let drain=0.045;
-    if(leftClosed)drain+=0.17;
-    if(rightClosed)drain+=0.17;
-    if(cameraOpen)drain+=0.12;
-    power=Math.max(0,power-drain);
-    if(power<=0){
-      blackout=true;leftClosed=false;rightClosed=false;cameraOpen=false;
-      message("POWER OUT — the office has gone dark.");
-      render();
-      setTimeoutGame(()=>{if(running)finish(false)},5500);
-    }else render();
-  }
-
-  function toggleDoor(side){
-    if(!running||blackout)return;
-    if(side==="left")leftClosed=!leftClosed;
-    else rightClosed=!rightClosed;
-    render();
-  }
-
-  function useLight(side){
-    if(!running||blackout||cameraOpen)return;
-    const enemy=enemies.find(e=>e.side===side&&e.pos===e.route.length-1);
-    $("flash").style.opacity=".45";
-    message(enemy?`${enemy.name} is right outside!`: `The ${side} hall is empty.`);
-    if(enemy){
-      const caught=enemy;
-      const timeout=setTimeout(()=>{
-        if(running)message("");
-      },900);
-      attackTimeouts.push(timeout);
-    }else{
-      const timeout=setTimeout(()=>{if(running)message("")},700);
-      attackTimeouts.push(timeout);
-    }
-    const timeout=setTimeout(()=>{$("flash").style.opacity="0"},180);
-    attackTimeouts.push(timeout);
-  }
-
-  function toggleCamera(){
-    if(!running||blackout)return;
-    cameraOpen=!cameraOpen;
-    if(cameraOpen)message("");
-    render();
-  }
-
-  function finish(won){
-    if(!running)return;
-    running=false;clearTimers();
-    $("overlay").classList.remove("hidden");
-    $("overlayTitle").textContent=won?"6 AM":"GAME OVER";
-    $("overlayText").textContent=won
-      ? `You survived Night ${night}. The morning crew will be here soon.`
-      : "The office fell silent. Manage your power, check the feeds, and try again.";
-    $("startButton").textContent=won?"START NEXT NIGHT":"RESTART NIGHT";
-    $("flash").style.opacity="0";
-    $("static").style.display="none";
-  }
-
-  $("startButton").onclick=()=>{
-    if($("overlayTitle").textContent==="6 AM")night++;
-    begin();
-  };
-  $("leftDoorButton").onclick=()=>toggleDoor("left");
-  $("rightDoorButton").onclick=()=>toggleDoor("right");
-  $("leftLightButton").onclick=()=>useLight("left");
-  $("rightLightButton").onclick=()=>useLight("right");
-  $("cameraButton").onclick=toggleCamera;
-
-  document.addEventListener("keydown",event=>{
-    if(event.repeat||!running)return;
-    switch(event.key.toLowerCase()){
-      case "a":toggleDoor("left");break;
-      case "d":toggleDoor("right");break;
-      case "q":useLight("left");break;
-      case "e":useLight("right");break;
-      case " ":event.preventDefault();toggleCamera();break;
-      case "arrowleft":
-        if(cameraOpen){selectedCam=(selectedCam+cameras.length-1)%cameras.length;render()}
-        break;
-      case "arrowright":
-        if(cameraOpen){selectedCam=(selectedCam+1)%cameras.length;render()}
-        break;
-    }
+  ctx.globalAlpha=1;
+  const tex=new THREE.CanvasTexture(canvas);
+  tex.magFilter=THREE.NearestFilter;
+  tex.minFilter=THREE.NearestMipmapNearestFilter;
+  tex.colorSpace=THREE.SRGBColorSpace;
+  return tex;
+}
+function texturedMaterial(base, colors, seed){
+  return new THREE.MeshStandardMaterial({
+    map:pixelTexture(base,colors,seed),roughness:1
   });
+}
 
-  enemies=makeEnemies();
-  render();
-})();
+const wallPixel=texturedMaterial("#514e46",["#393a36","#716951","#5d5a51"],8);
+const floorPixel=texturedMaterial("#38332d",["#252524","#4c4439","#393b39"],22);
+const ceilingPixel=texturedMaterial("#292b2b",["#1b1e1e","#343433","#262729"],33);
+const woodPixel=texturedMaterial("#594532",["#382e23","#796042","#57412e"],47);
+
+function box(name,x,y,z,sx,sy,sz,material,interactable=null){
+  const mesh=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),material);
+  mesh.name=name;mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;
+  mesh.userData.interactable=interactable;
+  scene.add(mesh);return mesh;
+}
+
+// Room shell
+box("floor",0,-.15,0,18,.3,22,floorPixel);
+box("ceiling",0,5,0,18,.25,22,ceilingPixel);
+box("back wall",0,2.4,-11,18,4.8,.35,wallPixel);
+box("left wall",-9,2.4,0,.35,4.8,22,wallPixel);
+box("right wall",9,2.4,0,.35,4.8,22,wallPixel);
+
+// Rear corridor and doorway details
+box("corridor floor",0,-.12,-15,5,.25,9,floorPixel);
+box("corridor back wall",0,2.4,-19.5,5,4.8,.3,darkWall);
+box("corridor left wall",-2.5,2.4,-15,.25,4.8,9,darkWall);
+box("corridor right wall",2.5,2.4,-15,.25,4.8,9,darkWall);
+
+// Wall panels, pillars, and ceiling lights
+for(let x=-7;x<=7;x+=2){
+  box("wall panel",x,2.25,-10.76,1.65,3.9,.08,materials.darkWall);
+  box("panel inset",x,2.3,-10.70,1.4,3.5,.06,wallPixel);
+}
+for(const x of [-7.8,7.8]){
+  box("door frame",x,2.2,-1.4,.55,4.4,.6,materials.metal);
+}
+for(const x of [-5,0,5]){
+  box("ceiling lamp",x,4.82,1,1.2,.08,.5,materials.metal);
+}
+const ceilingLight=new THREE.PointLight(0xe1d7af,38,16);
+ceilingLight.position.set(0,4.3,1);scene.add(ceilingLight);
+const corridorLight=new THREE.PointLight(0x8ca49a,17,12);
+corridorLight.position.set(0,3,-14);scene.add(corridorLight);
+
+// Interactive hinged security doors
+function makeDoor(side,x){
+  const group=new THREE.Group();
+  group.position.set(x,0,-1.4);
+  scene.add(group);
+  const panel=new THREE.Mesh(new THREE.BoxGeometry(2.1,4.1,.22),woodPixel);
+  panel.position.set(side==="left"?1.05:-1.05,2,0);
+  panel.castShadow=true;panel.receiveShadow=true;group.add(panel);
+  const stripe=new THREE.Mesh(new THREE.BoxGeometry(.12,3.8,.04),materials.metal);
+  stripe.position.set(side==="left"?1.05:-1.05,2,.14);group.add(stripe);
+  const handle=new THREE.Mesh(new THREE.BoxGeometry(.12,.6,.12),materials.gold);
+  handle.position.set(side==="left"?1.75:-1.75,1.8,.2);group.add(handle);
+  group.userData={interactable:{type:"door",side},isDoor:true,openAngle:0};
+  group.name=side+" security door";
+  return group;
+}
+const leftDoor=makeDoor("left",-4.8);
+const rightDoor=makeDoor("right",4.8);
+
+// Desk and interactive camera station
+box("desk top",0,1.1,2.6,6, .25,1.7,woodPixel);
+box("desk front",0,.52,3.25,5.6,1.05,.25,materials.darkWall);
+box("monitor stand",0,1.48,2.15,.25,.55,.25,materials.metal);
+const monitor=box("camera terminal",0,2.05,2.15,2.4,1.25,.18,materials.black,{type:"camera"});
+const monitorScreen=box("monitor display",0,2.05,2.045,2.12,.94,.035,materials.screen,{type:"camera"});
+box("keyboard",0,1.27,1.75,1.25,.12,.55,materials.metal);
+
+// Useful environmental details
+for(let i=0;i<6;i++){
+  const x=-6+i*2.4;
+  box("floor tile",x,.012,5,2.25,.025,2.1,materials.darkWall);
+}
+box("cabinet",-7,1.25,-6,1.5,2.5,1.2,materials.wood);
+box("cabinet handle",-7,1.4,-5.37,.08,.42,.07,materials.gold);
+box("supply shelf",7,2.6,-6,1.4,.14,2,materials.metal);
+box("crate",6.8,.55,-6.3,1.1,1.1,1.1,woodPixel);
+box("crate",7.1,.45,-7.5,.8,.9,.8,woodPixel);
+
+// Lighting and blocky horror atmosphere
+scene.add(new THREE.HemisphereLight(0x68757a,0x171310,.75));
+const officeLamp=new THREE.PointLight(0xc5c7a3,22,11);
+officeLamp.position.set(0,4,3);scene.add(officeLamp);
+const hallLamp=new THREE.PointLight(0x788c82,12,9);
+hallLamp.position.set(0,3,-7);scene.add(hallLamp);
+const flashlight=new THREE.SpotLight(0xd9e0c7,0,18,Math.PI/7,.55,1.4);
+camera.add(flashlight);flashlight.position.set(0,0,0);flashlight.target.position.set(0,0,-1);
+camera.add(flashlight.target);scene.add(camera);
+
+// Camera controls
+let yaw=0,pitch=0,active=false,started=false;
+const keys=new Set();
+const raycaster=new THREE.Raycaster();
+const center=new THREE.Vector2(0,0);
+let nearby=null;
+const clock=new THREE.Clock();
+
+let power=100, elapsed=0, cameraOpen=false, selectedFeed=0;
+const feedNames=["OFFICE","WEST HALL","EAST HALL","STORAGE","BACK ROOM"];
+const feedTexts=[
+  "The desk and security terminal are visible.",
+  "The hallway stretches into darkness.",
+  "A dim light flickers at the far end.",
+  "Shelves and props cast long blocky shadows.",
+  "The image breaks up with static."
+];
+
+function makeFeedButtons(){
+  $("camMap").innerHTML="";
+  feedNames.forEach((name,index)=>{
+    const button=document.createElement("button");
+    button.textContent=`CAM ${String(index+1).padStart(2,"0")}`;
+    button.onclick=()=>selectFeed(index);
+    $("camMap").appendChild(button);
+  });
+}
+function selectFeed(index){
+  selectedFeed=index;
+  $("camTitle").textContent=feedNames[index];
+  $("camDescription").textContent=feedTexts[index];
+}
+makeFeedButtons();
+
+function interactableFor(object){
+  let current=object;
+  while(current){
+    if(current.userData?.interactable)return current;
+    current=current.parent;
+  }
+  return null;
+}
+function updateTarget(){
+  raycaster.setFromCamera(center,camera);
+  const hits=raycaster.intersectObjects(scene.children,true);
+  const hit=hits.find(h=>interactableFor(h.object));
+  nearby=hit?interactableFor(hit.object):null;
+  if(nearby){
+    const data=nearby.userData.interactable;
+    $("prompt").style.display="block";
+    $("prompt").textContent=data.type==="door"
+      ? `E — Toggle ${data.side} security door`
+      : "E — Use camera terminal";
+  }else $("prompt").style.display="none";
+}
+
+function toggleCamera(){
+  cameraOpen=!cameraOpen;
+  $("cam").style.display=cameraOpen?"block":"none";
+  if(cameraOpen){document.exitPointerLock?.();active=false}
+}
+function interact(){
+  if(cameraOpen){toggleCamera();return}
+  if(!nearby)return;
+  const data=nearby.userData.interactable;
+  if(data.type==="door"){
+    const door=data.side==="left"?leftDoor:rightDoor;
+    door.userData.openAngle=door.userData.openAngle===0?Math.PI/2:0;
+    door.rotation.y=(data.side==="left"?1:-1)*door.userData.openAngle;
+    power=Math.max(0,power-.2);
+  }else if(data.type==="camera"){
+    toggleCamera();
+  }
+}
+
+renderer.domElement.addEventListener("click",()=>{
+  if(started&&!cameraOpen)renderer.domElement.requestPointerLock();
+});
+document.addEventListener("pointerlockchange",()=>{
+  active=document.pointerLockElement===renderer.domElement;
+});
+document.addEventListener("mousemove",event=>{
+  if(!active)return;
+  yaw-=event.movementX*.002;
+  pitch-=event.movementY*.002;
+  pitch=THREE.MathUtils.clamp(pitch,-1.35,1.35);
+  camera.rotation.order="YXZ";
+  camera.rotation.set(pitch,yaw,0);
+});
+document.addEventListener("keydown",event=>{
+  keys.add(event.code);
+  if(event.code==="KeyE")interact();
+  if(event.code==="Escape"&&cameraOpen)toggleCamera();
+});
+document.addEventListener("keyup",event=>keys.delete(event.code));
+
+$("start").onclick=()=>{
+  $("overlay").classList.add("hidden");
+  started=true;
+  renderer.domElement.requestPointerLock();
+};
+addEventListener("resize",()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+
+function updateMovement(delta){
+  if(!active||cameraOpen)return;
+  const speed=4.2;
+  const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
+  const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
+  const move=new THREE.Vector3();
+  if(keys.has("KeyW"))move.add(forward);
+  if(keys.has("KeyS"))move.sub(forward);
+  if(keys.has("KeyD"))move.add(right);
+  if(keys.has("KeyA"))move.sub(right);
+  if(move.lengthSq()>0){
+    move.normalize().multiplyScalar(speed*delta);
+    camera.position.add(move);
+  }
+  camera.position.x=THREE.MathUtils.clamp(camera.position.x,-8,8);
+  camera.position.z=THREE.MathUtils.clamp(camera.position.z,-10,7);
+  camera.position.y=1.65;
+}
+function updateHUD(delta){
+  if(!started)return;
+  elapsed+=delta;
+  power=Math.max(0,power-delta*(cameraOpen?.09:.035));
+  const hour=Math.min(6,Math.floor(elapsed/45));
+  $("time").textContent=hour===0?"12 AM":`${hour} AM`;
+  $("power").textContent=`${Math.ceil(power)}%`;
+  if(power<=0){
+    officeLamp.intensity=0;
+    ceilingLight.intensity=0;
+    hallLamp.intensity=0;
+  }
+  if(hour>=6){
+    started=false;
+    document.exitPointerLock?.();
+    $("card").innerHTML="<h1>6 AM</h1><p>You made it through the shift.</p><button onclick='location.reload()'>PLAY AGAIN</button>";
+    $("overlay").classList.remove("hidden");
+  }
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  const delta=Math.min(clock.getDelta(),.05);
+  updateMovement(delta);
+  updateHUD(delta);
+  updateTarget();
+  renderer.render(scene,camera);
+}
+animate();
 </script>
 </body>
 </html>
