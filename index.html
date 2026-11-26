@@ -2,54 +2,65 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Night Shift</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Last Nights 3 - 5 Nights at Ducks</title>
 <style>
   *{box-sizing:border-box}
-  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08090b;color:#e8e8e8;font:14px monospace}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08090b;color:#eee;font:14px monospace}
   canvas{display:block;image-rendering:pixelated}
-  #hud{position:fixed;inset:12px 14px auto;z-index:2;display:flex;justify-content:space-between;pointer-events:none;text-shadow:2px 2px #000}
-  #readout{display:flex;gap:16px;background:#08090bcc;padding:9px 12px;border:1px solid #777}
-  #help{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:2;text-align:center;background:#08090bcc;border:1px solid #777;padding:9px 14px;pointer-events:none}
-  #prompt{position:fixed;left:50%;t:grid;place-items:center;background:#000c;text-align:center;padding:20px}
-  #card{max-width:540px;backgroun11;padding:28px;border:2px solid #777}
-  #card h1{letter-spacing:5px}
+  #hud{position:fixed;left:12px;right:12px;top:12px;z-index:2;display:flex;justify-content:space-between;gap:12px;pointer-events:none;text-shadow:2px 2px #000}
+  #titleHud,#readout{background:#08090bdd;border:1px solid #777;padding:9px 12px}
+  #titleHud{font-weight:bold;letter-spacing:2px}
+  #readout{display:flex;gap:16px;flex-wrap:wrap}
+  #crosshair{position:fixed;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;text-shadow:0 0 5px black}
+  #prompt{position:fixed;z-index:3;left:50%;top:59%;transform:translate(-50%,-50%);display:none;padding:10px 14px;background:#090a0ddd;border:1px solid #aaa;pointer-events:none}
+  #help{position:fixed;z-index:2;bottom:12px;left:50%;transform:translateX(-50%);max-width:95%;padding:9px 12px;background:#08090bdd;border:1px solid #777;text-align:center;pointer-events:none}
+  #overlay{position:fixed;inset:0;z-index:5;display:grid;place-items:center;background:#000c;padding:20px;text-align:center}
+  #card{max-width:580px;padding:28px;background:#111;border:2px solid #777}
+  #card h1{letter-spacing:3px;line-height:1.3}
   #card p{color:#ccc;line-height:1.7}
-  button{font:inherit;color:white;background:#3483b;border:1px solid #aaa;padding:12px 20px;cursor:pointer}
+  button{padding:12px 18px;background:#34383b;border:1px solid #aaa;color:#fff;font:inherit;cursor:pointer}
   button:hover{background:#50565a}
-  #cam{position:fixed;inset:8%;z-index:4;display:none;border:3px solid #aaa;background:#080b0bdd;padding:18px;text-align:center;pointer-events:none}
+  #cam{position:fixed;z-index:4;inset:8%;display:none;padding:18px;text-align:center;background:#080b0dee;border:3px solid #aaa}
   #cam h2{letter-spacing:4px}
-  #camMap{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:24px}
+  #camDescription{margin-top:35px;font-size:18px;color:#ccd4d1}
+  #camMap{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:25px}
   #camMap button{pointer-events:auto}
-  #camDescription{font-size:18px;margin-top:40px;color:#c9d2d0}
   .hidden{display:none!important}
+  @media(max-width:600px){
+    #hud{flex-direction:column;align-items:flex-start}
+    #readout{gap:9px;font-size:12px}
+    #help{font-size:11px}
+    #cam{inset:5%}
+  }
 </style>
 </head>
 <body>
 <div id="hud">
-  <strong>NIGHT SHIFT</strong>
+  <div id="titleHud">LAST NIGHTS 3 - 5 NIGHTS AT DUCKS</div>
   <div id="readout">
+    <span>NIGHT <b id="night">1</b></span>
     <span>TIME <b id="time">12 AM</b></span>
     <span>POWER <b id="power">100%</b></span>
   </div>
 </div>
 <div id="crosshair">+</div>
 <div id="prompt"></div>
-<div id="help">WASD move · Mouse look · E interact · Click to lock mouse · ESC unlocks</div>
+<div id="help">WASD move · Mouse look · E interact · Click game to lock mouse · ESC unlocks</div>
 
 <div id="cam">
   <h2 id="camTitle">SECURITY CAMERAS</h2>
   <div id="camDescription">Select a camera feed.</div>
   <div id="camMap"></div>
-  <p>Press E or ESC to close monitor</p>
+  <p>Press E or ESC to close the monitor</p>
 </div>
 
 <div id="overlay">
   <div id="card">
-    <h1>NIGHT SHIFT</h1>
-    <p>Explore the security office in first person. Use the terminals, inspect the doors, and conserve power. This is an original Minecraft-inspired horror-game starting point.</p>
-    <p>Click start, then click the scene to control the mouse. Move with WASD; look around with the mouse; press E near objects to interact.</p>
-    <button id="start">START SHIFT</button>
+    <h1>LAST NIGHTS 3<br>5 NIGHTS AT DUCKS</h1>
+    <p>Explore the security office in first person. Use the camera terminal, inspect the security doors, and conserve power.</p>
+    <p>Click START SHIFT to begin. Then click the game to capture the mouse. Move with WASD, look with the mouse, and press E near an object.</p>
+    <button id="startButton" type="button">START SHIFT</button>
   </div>
 </div>
 
@@ -59,28 +70,26 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 const $ = id => document.getElementById(id);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x101317);
-scene.fog = new THREE.Fog(0x101317, 8, 34);
+scene.fog = new THREE.Fog(0x101317, 9, 34);
 
-const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 100);
-camera.position.set(0, 1.65, 5);
+const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 100);
+camera.position.set(0,1.65,5);
+camera.rotation.order = "YXZ";
 
 const renderer = new THREE.WebGLRenderer({antialias:false});
-renderer.setSize(innerWidth, innerHeight);
+renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(1);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-document.body.appendChild(renderer.domElement);
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.domElement.style.position="fixed";
+renderer.domElement.style.inset="0";
+renderer.domElement.style.zIndex="0";
+document.body.prepend(renderer.domElement);
 
-const mat = (color, roughness=1) => new THREE.MeshStandardMaterial({color, roughness});
-const materials = {
-  wall:mat(0x55524a), darkWall:mat(0x282a29), floor:mat(0x37332d),
-  metal:mat(0x626463), black:mat(0x111313), wood:mat(0x514233),
-  green:mat(0x315640), red:mat(0x8a2824), screen:mat(0x254b48),
-  gold:mat(0x8d713c)
-};
+const basic = color => new THREE.MeshStandardMaterial({color,roughness:1});
 
-function pixelTexture(base, colors, seed=1) {
+function pixelTexture(base, colors, seed=1){
   const size=128, canvas=document.createElement("canvas");
   canvas.width=canvas.height=size;
   const ctx=canvas.getContext("2d");
@@ -88,148 +97,139 @@ function pixelTexture(base, colors, seed=1) {
   let n=seed;
   const rand=()=>{n=(n*1664525+1013904223)>>>0;return n/4294967296};
   for(let i=0;i<1100;i++){
-    ctx.globalAlpha=.18+rand()*.28;
+    ctx.globalAlpha=.18+rand()*.27;
     ctx.fillStyle=colors[Math.floor(rand()*colors.length)];
-    const side=2+Math.floor(rand()*9);
-    ctx.fillRect(Math.floor(rand()*size),Math.floor(rand()*size),side,side);
+    const s=2+Math.floor(rand()*8);
+    ctx.fillRect(Math.floor(rand()*size),Math.floor(rand()*size),s,s);
   }
   ctx.globalAlpha=1;
-  const tex=new THREE.CanvasTexture(canvas);
-  tex.magFilter=THREE.NearestFilter;
-  tex.minFilter=THREE.NearestMipmapNearestFilter;
-  tex.colorSpace=THREE.SRGBColorSpace;
-  return tex;
+  const texture=new THREE.CanvasTexture(canvas);
+  texture.magFilter=THREE.NearestFilter;
+  texture.minFilter=THREE.NearestMipmapNearestFilter;
+  texture.colorSpace=THREE.SRGBColorSpace;
+  return texture;
 }
-function texturedMaterial(base, colors, seed){
-  return new THREE.MeshStandardMaterial({
-    map:pixelTexture(base,colors,seed),roughness:1
-  });
+function textured(base,colors,seed){
+  return new THREE.MeshStandardMaterial({map:pixelTexture(base,colors,seed),roughness:1});
 }
 
-const wallPixel=texturedMaterial("#514e46",["#393a36","#716951","#5d5a51"],8);
-const floorPixel=texturedMaterial("#38332d",["#252524","#4c4439","#393b39"],22);
-const ceilingPixel=texturedMaterial("#292b2b",["#1b1e1e","#343433","#262729"],33);
-const woodPixel=texturedMaterial("#594532",["#382e23","#796042","#57412e"],47);
+const wall=textured("#514e46",["#393a36","#716951","#5d5a51"],8);
+const floor=textured("#38332d",["#252524","#4c4439","#393b39"],22);
+const ceiling=textured("#292b2b",["#1b1e1e","#343433","#262729"],33);
+const wood=textured("#594532",["#382e23","#796042","#57412e"],47);
+const metal=basic(0x626463), dark=basic(0x252929), black=basic(0x111313);
+const gold=basic(0x8d713c), screenMat=basic(0x254b48);
 
 function box(name,x,y,z,sx,sy,sz,material,interactable=null){
   const mesh=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),material);
-  mesh.name=name;mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;
-  mesh.userData.interactable=interactable;
-  scene.add(mesh);return mesh;
+  mesh.name=name;mesh.position.set(x,y,z);
+  mesh.castShadow=true;mesh.receiveShadow=true;
+  if(interactable)mesh.userData.interactable=interactable;
+  scene.add(mesh);
+  return mesh;
 }
 
-// Room shell
-box("floor",0,-.15,0,18,.3,22,floorPixel);
-box("ceiling",0,5,0,18,.25,22,ceilingPixel);
-box("back wall",0,2.4,-11,18,4.8,.35,wallPixel);
-box("left wall",-9,2.4,0,.35,4.8,22,wallPixel);
-box("right wall",9,2.4,0,.35,4.8,22,wallPixel);
+// Office room
+box("office floor",0,-.15,0,18,.3,22,floor);
+box("office ceiling",0,5,0,18,.25,22,ceiling);
+box("back wall",0,2.4,-11,18,4.8,.35,wall);
+box("left wall",-9,2.4,0,.35,4.8,22,wall);
+box("right wall",9,2.4,0,.35,4.8,22,wall);
 
-// Rear corridor and doorway details
-box("corridor floor",0,-.12,-15,5,.25,9,floorPixel);
-box("corridor back wall",0,2.4,-19.5,5,4.8,.3,darkWall);
-box("corridor left wall",-2.5,2.4,-15,.25,4.8,9,darkWall);
-box("corridor right wall",2.5,2.4,-15,.25,4.8,9,darkWall);
+// Hall beyond the office
+box("hall floor",0,-.12,-15,5,.25,9,floor);
+box("hall end wall",0,2.4,-19.5,5,4.8,.3,dark);
+box("hall left wall",-2.5,2.4,-15,.25,4.8,9,dark);
+box("hall right wall",2.5,2.4,-15,.25,4.8,9,dark);
 
-// Wall panels, pillars, and ceiling lights
+// Wall panels and room details
 for(let x=-7;x<=7;x+=2){
-  box("wall panel",x,2.25,-10.76,1.65,3.9,.08,materials.darkWall);
-  box("panel inset",x,2.3,-10.70,1.4,3.5,.06,wallPixel);
+  box("wall panel",x,2.25,-10.76,1.65,3.9,.08,dark);
+  box("panel inset",x,2.3,-10.70,1.4,3.5,.06,wall);
 }
-for(const x of [-7.8,7.8]){
-  box("door frame",x,2.2,-1.4,.55,4.4,.6,materials.metal);
-}
-for(const x of [-5,0,5]){
-  box("ceiling lamp",x,4.82,1,1.2,.08,.5,materials.metal);
-}
-const ceilingLight=new THREE.PointLight(0xe1d7af,38,16);
-ceilingLight.position.set(0,4.3,1);scene.add(ceilingLight);
-const corridorLight=new THREE.PointLight(0x8ca49a,17,12);
-corridorLight.position.set(0,3,-14);scene.add(corridorLight);
+box("storage cabinet",-7,1.25,-6,1.5,2.5,1.2,wood);
+box("cabinet handle",-6.2,1.4,-5.36,.08,.42,.08,gold);
+box("shelf",7,2.6,-6,1.4,.14,2,metal);
+box("box",6.8,.55,-6.3,1.1,1.1,1.1,wood);
+box("box",7.1,.45,-7.5,.8,.9,.8,wood);
 
-// Interactive hinged security doors
+// Desk and clickable camera terminal
+box("desk top",0,1.1,2.6,6,.25,1.7,wood);
+box("desk front",0,.52,3.25,5.6,1.05,.25,dark);
+box("monitor stand",0,1.48,2.15,.25,.55,.25,metal);
+box("camera terminal",0,2.05,2.15,2.4,1.25,.18,black,{type:"camera"});
+box("monitor screen",0,2.05,2.045,2.12,.94,.035,screenMat,{type:"camera"});
+box("keyboard",0,1.27,1.75,1.25,.12,.55,metal);
+
+// Hinged, interactable security doors
 function makeDoor(side,x){
   const group=new THREE.Group();
   group.position.set(x,0,-1.4);
-  scene.add(group);
-  const panel=new THREE.Mesh(new THREE.BoxGeometry(2.1,4.1,.22),woodPixel);
-  panel.position.set(side==="left"?1.05:-1.05,2,0);
-  panel.castShadow=true;panel.receiveShadow=true;group.add(panel);
-  const stripe=new THREE.Mesh(new THREE.BoxGeometry(.12,3.8,.04),materials.metal);
-  stripe.position.set(side==="left"?1.05:-1.05,2,.14);group.add(stripe);
-  const handle=new THREE.Mesh(new THREE.BoxGeometry(.12,.6,.12),materials.gold);
-  handle.position.set(side==="left"?1.75:-1.75,1.8,.2);group.add(handle);
-  group.userData={interactable:{type:"door",side},isDoor:true,openAngle:0};
   group.name=side+" security door";
+  group.userData.interactable={type:"door",side};
+  group.userData.closed=true;
+
+  const hingeSide=side==="left"?1:-1;
+  const panel=new THREE.Mesh(new THREE.BoxGeometry(2.1,4.1,.22),wood);
+  panel.position.set(hingeSide*1.05,2,0);
+  panel.castShadow=true;panel.receiveShadow=true;group.add(panel);
+
+  const stripe=new THREE.Mesh(new THREE.BoxGeometry(.12,3.8,.04),metal);
+  stripe.position.set(hingeSide*1.05,2,.14);group.add(stripe);
+
+  const handle=new THREE.Mesh(new THREE.BoxGeometry(.12,.6,.12),gold);
+  handle.position.set(hingeSide*1.75,1.8,.2);group.add(handle);
+
+  scene.add(group);
   return group;
 }
-const leftDoor=makeDoor("left",-4.8);
-const rightDoor=makeDoor("right",4.8);
+const doors={left:makeDoor("left",-4.8),right:makeDoor("right",4.8)};
 
-// Desk and interactive camera station
-box("desk top",0,1.1,2.6,6, .25,1.7,woodPixel);
-box("desk front",0,.52,3.25,5.6,1.05,.25,materials.darkWall);
-box("monitor stand",0,1.48,2.15,.25,.55,.25,materials.metal);
-const monitor=box("camera terminal",0,2.05,2.15,2.4,1.25,.18,materials.black,{type:"camera"});
-const monitorScreen=box("monitor display",0,2.05,2.045,2.12,.94,.035,materials.screen,{type:"camera"});
-box("keyboard",0,1.27,1.75,1.25,.12,.55,materials.metal);
-
-// Useful environmental details
-for(let i=0;i<6;i++){
-  const x=-6+i*2.4;
-  box("floor tile",x,.012,5,2.25,.025,2.1,materials.darkWall);
-}
-box("cabinet",-7,1.25,-6,1.5,2.5,1.2,materials.wood);
-box("cabinet handle",-7,1.4,-5.37,.08,.42,.07,materials.gold);
-box("supply shelf",7,2.6,-6,1.4,.14,2,materials.metal);
-box("crate",6.8,.55,-6.3,1.1,1.1,1.1,woodPixel);
-box("crate",7.1,.45,-7.5,.8,.9,.8,woodPixel);
-
-// Lighting and blocky horror atmosphere
+// Lighting
 scene.add(new THREE.HemisphereLight(0x68757a,0x171310,.75));
-const officeLamp=new THREE.PointLight(0xc5c7a3,22,11);
-officeLamp.position.set(0,4,3);scene.add(officeLamp);
-const hallLamp=new THREE.PointLight(0x788c82,12,9);
-hallLamp.position.set(0,3,-7);scene.add(hallLamp);
+const officeLight=new THREE.PointLight(0xc5c7a3,22,12);
+officeLight.position.set(0,4,3);scene.add(officeLight);
+const hallLight=new THREE.PointLight(0x788c82,12,10);
+hallLight.position.set(0,3,-7);scene.add(hallLight);
+
 const flashlight=new THREE.SpotLight(0xd9e0c7,0,18,Math.PI/7,.55,1.4);
-camera.add(flashlight);flashlight.position.set(0,0,0);flashlight.target.position.set(0,0,-1);
-camera.add(flashlight.target);scene.add(camera);
+camera.add(flashlight);
+flashlight.position.set(0,0,0);
+flashlight.target.position.set(0,0,-1);
+camera.add(flashlight.target);
+scene.add(camera);
 
-// Camera controls
-let yaw=0,pitch=0,active=false,started=false;
+// Game state
+let started=false, active=false, cameraOpen=false;
+let yaw=0,pitch=0,nearby=null,selectedFeed=0;
+let power=100,elapsed=0,night=1;
 const keys=new Set();
-const raycaster=new THREE.Raycaster();
-const center=new THREE.Vector2(0,0);
-let nearby=null;
 const clock=new THREE.Clock();
+const raycaster=new THREE.Raycaster();
 
-let power=100, elapsed=0, cameraOpen=false, selectedFeed=0;
 const feedNames=["OFFICE","WEST HALL","EAST HALL","STORAGE","BACK ROOM"];
 const feedTexts=[
   "The desk and security terminal are visible.",
-  "The hallway stretches into darkness.",
+  "A hallway stretches into darkness.",
   "A dim light flickers at the far end.",
   "Shelves and props cast long blocky shadows.",
   "The image breaks up with static."
 ];
 
-function makeFeedButtons(){
-  $("camMap").innerHTML="";
-  feedNames.forEach((name,index)=>{
-    const button=document.createElement("button");
-    button.textContent=`CAM ${String(index+1).padStart(2,"0")}`;
-    button.onclick=()=>selectFeed(index);
-    $("camMap").appendChild(button);
-  });
-}
+feedNames.forEach((name,index)=>{
+  const button=document.createElement("button");
+  button.textContent=`CAM ${String(index+1).padStart(2,"0")}`;
+  button.addEventListener("click",()=>selectFeed(index));
+  $("camMap").appendChild(button);
+});
 function selectFeed(index){
   selectedFeed=index;
   $("camTitle").textContent=feedNames[index];
   $("camDescription").textContent=feedTexts[index];
 }
-makeFeedButtons();
+selectFeed(0);
 
-function interactableFor(object){
+function findInteractable(object){
   let current=object;
   while(current){
     if(current.userData?.interactable)return current;
@@ -237,41 +237,81 @@ function interactableFor(object){
   }
   return null;
 }
-function updateTarget(){
-  raycaster.setFromCamera(center,camera);
+function updatePrompt(){
+  raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
   const hits=raycaster.intersectObjects(scene.children,true);
-  const hit=hits.find(h=>interactableFor(h.object));
-  nearby=hit?interactableFor(hit.object):null;
-  if(nearby){
-    const data=nearby.userData.interactable;
-    $("prompt").style.display="block";
-    $("prompt").textContent=data.type==="door"
-      ? `E — Toggle ${data.side} security door`
-      : "E — Use camera terminal";
-  }else $("prompt").style.display="none";
+  const hit=hits.find(item=>findInteractable(item.object));
+  nearby=hit?findInteractable(hit.object):null;
+
+  if(!nearby||cameraOpen){
+    $("prompt").style.display="none";
+    return;
+  }
+  const item=nearby.userData.interactable;
+  $("prompt").textContent=item.type==="door"
+    ?`E — ${nearby.userData.closed?"Open":"Close"} ${item.side} door`
+    :"E — Use camera terminal";
+  $("prompt").style.display="block";
 }
 
+function pausePointer(){
+  active=false;
+  if(document.pointerLockElement)document.exitPointerLock();
+}
 function toggleCamera(){
+  if(!started)return;
   cameraOpen=!cameraOpen;
   $("cam").style.display=cameraOpen?"block":"none";
-  if(cameraOpen){document.exitPointerLock?.();active=false}
+  $("prompt").style.display="none";
+  if(cameraOpen)pausePointer();
 }
 function interact(){
+  if(!started)return;
   if(cameraOpen){toggleCamera();return}
   if(!nearby)return;
-  const data=nearby.userData.interactable;
-  if(data.type==="door"){
-    const door=data.side==="left"?leftDoor:rightDoor;
-    door.userData.openAngle=door.userData.openAngle===0?Math.PI/2:0;
-    door.rotation.y=(data.side==="left"?1:-1)*door.userData.openAngle;
-    power=Math.max(0,power-.2);
-  }else if(data.type==="camera"){
+
+  const item=nearby.userData.interactable;
+  if(item.type==="door"){
+    nearby.userData.closed=!nearby.userData.closed;
+    const sign=item.side==="left"?1:-1;
+    nearby.rotation.y=nearby.userData.closed?0:sign*Math.PI/2;
+    power=Math.max(0,power-.15);
+    updateHud();
+  }else if(item.type==="camera"){
     toggleCamera();
   }
 }
 
+function updateHud(){
+  $("night").textContent=night;
+  $("power").textContent=`${Math.ceil(power)}%`;
+  const hour=Math.min(6,Math.floor(elapsed/45));
+  $("time").textContent=hour===0?"12 AM":`${hour} AM`;
+}
+function endShift(won){
+  started=false;active=false;cameraOpen=false;
+  $("cam").style.display="none";
+  pausePointer();
+  $("card").innerHTML=won
+    ?`<h1>6 AM</h1><p>You survived Night ${night}.</p><button id="again" type="button">PLAY AGAIN</button>`
+    :`<h1>SHIFT OVER</h1><p>The office power ran out. Try to conserve power.</p><button id="again" type="button">TRY AGAIN</button>`;
+  $("overlay").classList.remove("hidden");
+  $("again").addEventListener("click",()=>location.reload());
+}
+
+// Start button has a direct click handler and does not require pointer lock.
+$("startButton").addEventListener("click",()=>{
+  started=true;
+  elapsed=0;
+  power=100;
+  updateHud();
+  $("overlay").classList.add("hidden");
+});
+
 renderer.domElement.addEventListener("click",()=>{
-  if(started&&!cameraOpen)renderer.domElement.requestPointerLock();
+  if(started&&!cameraOpen&&!active){
+    renderer.domElement.requestPointerLock?.();
+  }
 });
 document.addEventListener("pointerlockchange",()=>{
   active=document.pointerLockElement===renderer.domElement;
@@ -281,71 +321,66 @@ document.addEventListener("mousemove",event=>{
   yaw-=event.movementX*.002;
   pitch-=event.movementY*.002;
   pitch=THREE.MathUtils.clamp(pitch,-1.35,1.35);
-  camera.rotation.order="YXZ";
   camera.rotation.set(pitch,yaw,0);
 });
+
 document.addEventListener("keydown",event=>{
   keys.add(event.code);
   if(event.code==="KeyE")interact();
   if(event.code==="Escape"&&cameraOpen)toggleCamera();
 });
 document.addEventListener("keyup",event=>keys.delete(event.code));
-
-$("start").onclick=()=>{
-  $("overlay").classList.add("hidden");
-  started=true;
-  renderer.domElement.requestPointerLock();
-};
+addEventListener("blur",()=>keys.clear());
 addEventListener("resize",()=>{
   camera.aspect=innerWidth/innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(innerWidth,innerHeight);
 });
 
-function updateMovement(delta){
+function movePlayer(delta){
   if(!active||cameraOpen)return;
-  const speed=4.2;
+  const speed=4;
   const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
   const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
   const move=new THREE.Vector3();
+
   if(keys.has("KeyW"))move.add(forward);
   if(keys.has("KeyS"))move.sub(forward);
   if(keys.has("KeyD"))move.add(right);
   if(keys.has("KeyA"))move.sub(right);
+
   if(move.lengthSq()>0){
     move.normalize().multiplyScalar(speed*delta);
     camera.position.add(move);
   }
-  camera.position.x=THREE.MathUtils.clamp(camera.position.x,-8,8);
-  camera.position.z=THREE.MathUtils.clamp(camera.position.z,-10,7);
+
+  camera.position.x=THREE.MathUtils.clamp(camera.position.x,-8.3,8.3);
+  camera.position.z=THREE.MathUtils.clamp(camera.position.z,-18.4,7.2);
   camera.position.y=1.65;
 }
-function updateHUD(delta){
+
+function updateGame(delta){
   if(!started)return;
+
   elapsed+=delta;
-  power=Math.max(0,power-delta*(cameraOpen?.09:.035));
+  power=Math.max(0,power-delta*(cameraOpen?.075:.025));
   const hour=Math.min(6,Math.floor(elapsed/45));
-  $("time").textContent=hour===0?"12 AM":`${hour} AM`;
-  $("power").textContent=`${Math.ceil(power)}%`;
+  updateHud();
+
   if(power<=0){
-    officeLamp.intensity=0;
-    ceilingLight.intensity=0;
-    hallLamp.intensity=0;
+    officeLight.intensity=0;
+    hallLight.intensity=0;
+    if(hour<6){endShift(false);return}
   }
-  if(hour>=6){
-    started=false;
-    document.exitPointerLock?.();
-    $("card").innerHTML="<h1>6 AM</h1><p>You made it through the shift.</p><button onclick='location.reload()'>PLAY AGAIN</button>";
-    $("overlay").classList.remove("hidden");
-  }
+  if(hour>=6)endShift(true);
 }
 
 function animate(){
   requestAnimationFrame(animate);
   const delta=Math.min(clock.getDelta(),.05);
-  updateMovement(delta);
-  updateHUD(delta);
-  updateTarget();
+  movePlayer(delta);
+  updateGame(delta);
+  updatePrompt();
   renderer.render(scene,camera);
 }
 animate();
