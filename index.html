@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Last Nights 3</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#08090b;
+  --panel:#111418;
+  --line:#434950;
+  --text:#e4e5e6;
+  --muted:#9ba1a7;
+  --red:#d44646;
+  --green:#83c48c;
+  --amber:#e7bd66;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#030405;color:var(--text);font:15px/1.4 monospace}
+button{color:var(--text);font:inherit;background:#20252a;border:1px solid #5a626a;padding:10px 14px;cursor:pointer}
+button:hover{background:#343b42}
+button:disabled{opacity:.5;cursor:not-allowed}
+#app{min-height:100vh;display:grid;place-items:center;padding:16px}
+.frame{width:min(1100px,100%);border:1px solid #41464b;background:#101214;box-shadow:0 0 50px #000}
+header{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:12px 16px;background:#08090a;border-bottom:1px solid #333}
+h1{margin:0;font-size:20px;letter-spacing:3px}
+.hud{display:flex;gap:18px;flex-wrap:wrap;color:#cbd0d3}
+.hud b{color:white}
+#scene{height:min(58vh,510px);min-height:350px;position:relative;overflow:hidden;background:#0b0d0f}
+.office-bg{position:absolute;inset:0;background:
+ radial-gradient(ellipse at 50% 48%,#343638 0,#1b1e20 35%,#0b0d0f 78%);
+}
+.ceiling{position:absolute;left:12%;right:12%;top:0;height:16%;background:#111315;border-bottom:3px solid #414244}
+.floor{position:absolute;bottom:0;left:0;right:0;height:32%;background:repeating-linear-gradient(90deg,#242628 0 90px,#1d1f21 90px 180px)}
+.desk{position:absolute;bottom:0;left:21%;width:58%;height:27%;background:linear-gradient(#484644,#262525 30%,#101112);clip-path:polygon(4% 0,96% 0,100% 100%,0 100%)}
+.monitor{position:absolute;bottom:24%;left:47%;width:6%;height:14%;border:3px solid #64696c;background:#060809}
+.door{position:absolute;top:15%;height:67%;width:17%;border:5px solid #45484a;background:#050607;z-index:2;transition:background .15s}
+#leftDoor{left:0} #rightDoor{right:0}
+.door.closed{background:repeating-linear-gradient(0deg,#25282a 0 22px,#35383a 22px 25px)}
+.hall{position:absolute;top:23%;height:50%;width:14%;background:#000;z-index:1}
+#leftHall{left:16%} #rightHall{right:16%}
+.enemy{display:none;position:absolute;z-index:3;bottom:16%;font-size:clamp(60px,10vw,115px);filter:drop-shadow(0 0 10px #c00);animation:shake .12s infinite}
+#enemyL{left:2%} #enemyR{right:2%}
+@keyframes shake{50%{transform:translateX(3px)}}
+#flash{position:absolute;inset:0;background:#fff1a6;opacity:0;z-index:4;pointer-events:none;mix-blend-mode:screen}
+#static{position:absolute;inset:0;z-index:5;display:none;background:repeating-linear-gradient(0deg,#aaa2 0 1px,transparent 1px 4px);pointer-events:none}
+.message{position:absolute;z-index:6;left:50%;top:12px;transform:translateX(-50%);text-align:center;color:#ff7777;text-shadow:0 0 8px #f00;max-width:92%}
+#cameraView{position:absolute;inset:0;z-index:5;display:none;padding:20px;background:radial-gradient(#272b2e,#070809);text-align:center}
+#cameraView h2{letter-spacing:4px}
+.camArt{height:58%;display:grid;place-items:center;font-size:clamp(60px,12vw,130px);color:#aeb2b4;text-shadow:0 0 12px #aaa}
+.camInfo{color:#c2c5c6}
+.buttons{display:flex;justify-content:space-between;gap:10px;padding:12px;flex-wrap:wrap;background:#0a0b0c}
+.buttons section{display:flex;gap:8px;flex-wrap:wrap}
+#footer{padding:0 16px 12px;display:flex;justify-content:space-between;gap:12px;color:var(--muted)}
+#overlay{position:absolute;inset:0;z-index:10;display:grid;place-items:center;background:#030405ed;padding:20px;text-align:center}
+#overlay .card{max-width:620px}
+#overlay h2{font-size:clamp(28px,6vw,46px);letter-spacing:5px;margin:0 0 14px}
+#overlay p{color:#c0c3c5}
+#overlay button{margin-top:14px;padding:12px 22px}
+.card .small{font-size:13px;color:#92989d}
+.hidden{display:none!important}
+#powerBar{display:inline-block;width:90px;height:10px;border:1px solid #93999e;vertical-align:middle;margin-left:6px}
+#powerFill{height:100%;width:100%;background:var(--green)}
+#camMap{position:absolute;right:12px;bottom:12px;display:none;z-index:7;gap:5px;flex-wrap:wrap;max-width:250px}
+#camMap button{padding:6px 8px;font-size:12px}
+#camMap button.selected{border-color:var(--amber);color:var(--amber)}
+@media(max-width:650px){
+ header{align-items:flex-start;flex-direction:column}
+ .hud{gap:9px;font-size:13px}
+ #scene{min-height:330px}
+ .buttons{justify-content:center}
+ .buttons section{justify-content:center}
+ #footer{font-size:12px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="frame">
+  <header>
+    <h1>LAST NIGHTS 3</h1>
+    <div class="hud">
+      <span>Night <b id="night">1</b></span>
+      <span>Time <b id="time">12 AM</b></span>
+      <span>Power <b id="powerText">100%</b><i id="powerBar"><i id="powerFill"></i></i></span>
+      <span>Usage <b id="usage">▮</b></span>
+    </div>
+  </header>
+
+  <main id="scene">
+    <div class="office-bg"></div><div class="ceiling"></div>
+    <div id="leftHall" class="hall"></div><div id="rightHall" class="hall"></div>
+    <div id="leftDoor" class="door"></div><div id="rightDoor" class="door"></div>
+    <div class="floor"></div><div class="desk"></div><div class="monitor"></div>
+    <div id="enemyL" class="enemy">🐻</div><div id="enemyR" class="enemy">🐰</div>
+    <div id="flash"></div><div id="static"></div>
+    <div id="officeMessage" class="message"></div>
+
+    <div id="cameraView">
+      <h2 id="camName">CAM 01 — STAGE</h2>
+      <div class="camArt" id="camArt">📹</div>
+      <div class="camInfo" id="camInfo">The feed hisses with static.</div>
+    </div>
+    <div id="camMap"></div>
+
+    <div id="overlay">
+      <div class="card">
+        <h2 id="overlayTitle">LAST NIGHTS 3</h2>
+        <p id="overlayText">You are the overnight guard. Survive until 6 AM. Check the cameras, use the hall lights, and close a door only when danger is close. Everything drains power.</p>
+        <p class="small">Controls: A / D doors · Q / E lights · Space cameras · arrow keys switch camera feeds</p>
+        <button id="startButton">START NIGHT</button>
+      </div>
+    </div>
+  </main>
+
+  <div class="buttons">
+    <section>
+      <button id="leftDoorButton">Close Left Door [A]</button>
+      <button id="leftLightButton">Left Light [Q]</button>
+    </section>
+    <section>
+      <button id="cameraButton">Open Cameras [Space]</button>
+      <button id="rightLightButton">Right Light [E]</button>
+      <button id="rightDoorButton">Close Right Door [D]</button>
+    </section>
+  </div>
+  <div id="footer"><span id="status">Office — keep an eye on the halls.</span><span>Survive until 6 AM</span></div>
+</div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const cameras = [
+    {name:"CAM 01 — STAGE", icon:"🎭", text:"A dusty stage. The curtains barely move."},
+    {name:"CAM 02 — DINING ROOM", icon:"🍽️", text:"Tables sit empty beneath flickering lights."},
+    {name:"CAM 03 — STORAGE", icon:"📦", text:"Old props and spare parts fill the room."},
+    {name:"CAM 04 — WEST HALL", icon:"🚪", text:"A long, dark hallway leads toward your office."},
+    {name:"CAM 05 — EAST HALL", icon:"🚪", text:"The far end of the corridor is lost in darkness."},
+    {name:"CAM 06 — BACK ROOM", icon:"🔧", text:"A camera feed crackles in the back room."}
+  ];
+
+  let running=false, night=1, power=100, hour=0;
+  let leftClosed=false, rightClosed=false, cameraOpen=false, selectedCam=0;
+  let enemies, timers=[], attackTimeouts=[], blackout=false, lastPowerUsage="▮";
+  const officeMessage=$("officeMessage");
+
+  function message(text){ officeMessage.textContent=text; }
+  function clearTimers(){
+    timers.forEach(clearInterval); timers=[];
+    attackTimeouts.forEach(clearTimeout); attackTimeouts=[];
+  }
+  function setIntervalGame(fn, ms){ timers.push(setInterval(fn, ms)); }
+  function setTimeoutGame(fn, ms){ attackTimeouts.push(setTimeout(fn, ms)); }
+
+  function makeEnemies(){
+    return [
+      {name:"Marlow", icon:"🐻", side:"left", route:[0,1,2,3], pos:0, aggression:0.22},
+      {name:"Patch", icon:"🐰", side:"right", route:[5,1,4], pos:0, aggression:0.27}
+    ];
+  }
+
+  function render(){
+    $("night").textContent=night;
+    $("time").textContent=hour===0?"12 AM":hour+" AM";
+    $("powerText").textContent=Math.ceil(power)+"%";
+    $("powerFill").style.width=Math.max(0,power)+"%";
+    $("powerFill").style.background=power<20?"#d44646":power<45?"#e7bd66":"#83c48c";
+    const usage=1+(leftClosed?1:0)+(rightClosed?1:0)+(cameraOpen?1:0);
+    $("usage").textContent="▮".repeat(Math.min(usage,4));
+    $("leftDoor").classList.toggle("closed",leftClosed);
+    $("rightDoor").classList.toggle("closed",rightClosed);
+    $("enemyL").style.display=enemies.some(e=>e.side==="left"&&e.pos===e.route.length-1)?"block":"none";
+    $("enemyR").style.display=enemies.some(e=>e.side==="right"&&e.pos===e.route.length-1)?"block":"none";
+    $("cameraView").style.display=cameraOpen?"block":"none";
+    $("camMap").style.display=cameraOpen?"flex":"none";
+    $("cameraButton").textContent=cameraOpen?"Close Cameras [Space]":"Open Cameras [Space]";
+    $("static").style.display=cameraOpen?"block":"none";
+    $("camName").textContent=cameras[selectedCam].name;
+    $("camArt").textContent=cameras[selectedCam].icon;
+    const sightings=enemies.filter(e=>e.route[e.pos]===selectedCam);
+    $("camInfo").textContent=sightings.length
+      ? `MOTION DETECTED: ${sightings.map(e=>e.name).join(", ")}`
+      : cameras[selectedCam].text;
+    $("camMap").innerHTML=cameras.map((cam,i)=>
+      `<button data-cam="${i}" class="${selectedCam===i?"selected":""}">CAM ${String(i+1).padStart(2,"0")}</button>`
+    ).join("");
+    $("camMap").querySelectorAll("button").forEach(button=>{
+      button.onclick=()=>{selectedCam=Number(button.dataset.cam);render()};
+    });
+    $("status").textContent=cameraOpen?`Camera monitor — ${cameras[selectedCam].name}`:"Office — listen for movement.";
+  }
+
+  function begin(){
+    clearTimers();
+    running=true;power=100;hour=0;leftClosed=false;rightClosed=false;
+    cameraOpen=false;blackout=false;enemies=makeEnemies();
+    $("overlay").classList.add("hidden");
+    $("flash").style.opacity="0";
+    message("");
+    render();
+
+    // Each in-game hour is 40 seconds: a complete shift lasts four minutes.
+    setIntervalGame(()=>{
+      if(!running)return;
+      hour++;
+      if(hour>=6){finish(true);return}
+      render();
+    },40000);
+
+    setIntervalGame(moveEnemies,4500);
+    setIntervalGame(drainPower,1000);
+  }
+
+  function moveEnemies(){
+    if(!running||blackout)return;
+    enemies.forEach(enemy=>{
+      const chance=Math.min(.82,enemy.aggression+(night-1)*.055+hour*.025);
+      if(Math.random()>chance)return;
+
+      if(enemy.pos<enemy.route.length-1){
+        enemy.pos++;
+      }else{
+        const blocked=enemy.side==="left"?leftClosed:rightClosed;
+        if(blocked){
+          enemy.pos=Math.max(0,enemy.pos-2);
+          message(`A heavy impact shakes the ${enemy.side} door!`);
+          setTimeoutGame(()=>{if(running)message("")},1400);
+        }else{
+          message(`Movement at the ${enemy.side} door!`);
+          const timeout=setTimeout(()=>{if(running&&! (enemy.side==="left"?leftClosed:rightClosed))finish(false)},2200);
+          attackTimeouts.push(timeout);
+        }
+      }
+    });
+    render();
+  }
+
+  function drainPower(){
+    if(!running||blackout)return;
+    let drain=0.045;
+    if(leftClosed)drain+=0.17;
+    if(rightClosed)drain+=0.17;
+    if(cameraOpen)drain+=0.12;
+    power=Math.max(0,power-drain);
+    if(power<=0){
+      blackout=true;leftClosed=false;rightClosed=false;cameraOpen=false;
+      message("POWER OUT — the office has gone dark.");
+      render();
+      setTimeoutGame(()=>{if(running)finish(false)},5500);
+    }else render();
+  }
+
+  function toggleDoor(side){
+    if(!running||blackout)return;
+    if(side==="left")leftClosed=!leftClosed;
+    else rightClosed=!rightClosed;
+    render();
+  }
+
+  function useLight(side){
+    if(!running||blackout||cameraOpen)return;
+    const enemy=enemies.find(e=>e.side===side&&e.pos===e.route.length-1);
+    $("flash").style.opacity=".45";
+    message(enemy?`${enemy.name} is right outside!`: `The ${side} hall is empty.`);
+    if(enemy){
+      const caught=enemy;
+      const timeout=setTimeout(()=>{
+        if(running)message("");
+      },900);
+      attackTimeouts.push(timeout);
+    }else{
+      const timeout=setTimeout(()=>{if(running)message("")},700);
+      attackTimeouts.push(timeout);
+    }
+    const timeout=setTimeout(()=>{$("flash").style.opacity="0"},180);
+    attackTimeouts.push(timeout);
+  }
+
+  function toggleCamera(){
+    if(!running||blackout)return;
+    cameraOpen=!cameraOpen;
+    if(cameraOpen)message("");
+    render();
+  }
+
+  function finish(won){
+    if(!running)return;
+    running=false;clearTimers();
+    $("overlay").classList.remove("hidden");
+    $("overlayTitle").textContent=won?"6 AM":"GAME OVER";
+    $("overlayText").textContent=won
+      ? `You survived Night ${night}. The morning crew will be here soon.`
+      : "The office fell silent. Manage your power, check the feeds, and try again.";
+    $("startButton").textContent=won?"START NEXT NIGHT":"RESTART NIGHT";
+    $("flash").style.opacity="0";
+    $("static").style.display="none";
+  }
+
+  $("startButton").onclick=()=>{
+    if($("overlayTitle").textContent==="6 AM")night++;
+    begin();
+  };
+  $("leftDoorButton").onclick=()=>toggleDoor("left");
+  $("rightDoorButton").onclick=()=>toggleDoor("right");
+  $("leftLightButton").onclick=()=>useLight("left");
+  $("rightLightButton").onclick=()=>useLight("right");
+  $("cameraButton").onclick=toggleCamera;
+
+  document.addEventListener("keydown",event=>{
+    if(event.repeat||!running)return;
+    switch(event.key.toLowerCase()){
+      case "a":toggleDoor("left");break;
+      case "d":toggleDoor("right");break;
+      case "q":useLight("left");break;
+      case "e":useLight("right");break;
+      case " ":event.preventDefault();toggleCamera();break;
+      case "arrowleft":
+        if(cameraOpen){selectedCam=(selectedCam+cameras.length-1)%cameras.length;render()}
+        break;
+      case "arrowright":
+        if(cameraOpen){selectedCam=(selectedCam+1)%cameras.length;render()}
+        break;
+    }
+  });
+
+  enemies=makeEnemies();
+  render();
+})();
+</script>
+</body>
+</html>
